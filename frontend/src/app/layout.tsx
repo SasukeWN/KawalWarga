@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { APP_CONFIG } from "@/lib/config";
+import { ToastProvider } from "@/components/ui/Toast";
 import "./globals.css";
 
 const inter = Inter({
@@ -24,7 +25,7 @@ export default function RootLayout({
       <body
         className={`${inter.className} min-h-full flex flex-col bg-stone-50 text-stone-900`}
       >
-        {children}
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );
