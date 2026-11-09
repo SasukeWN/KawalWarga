@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { APP_CONFIG } from "@/lib/config";
+import { useAuth } from "@/lib/auth";
 import { Sidebar, type StaffRole, type StaffUserDisplay } from "./Sidebar";
 import { Topbar } from "./Topbar";
 
@@ -25,7 +27,29 @@ export function AppShell({
   onLogout,
   children,
 }: AppShellProps) {
+  const router = useRouter();
+  const { user: authUser, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const effectiveUser: StaffUserDisplay | undefined =
+    user ??
+    (authUser
+      ? {
+          name: authUser.name,
+          position: authUser.position,
+          role: authUser.role,
+        }
+      : undefined);
+
+  async function handleDefaultLogout() {
+    setMobileMenuOpen(false);
+    if (onLogout) {
+      onLogout();
+      return;
+    }
+    await logout();
+    router.replace("/masuk");
+  }
 
   return (
     <div className="flex min-h-screen w-full bg-stone-50 text-stone-900">
@@ -33,9 +57,9 @@ export function AppShell({
       <div className="hidden lg:flex lg:shrink-0">
         <Sidebar
           role={role}
-          user={user}
+          user={effectiveUser}
           activePath={activePath}
-          onLogout={onLogout}
+          onLogout={handleDefaultLogout}
           className="sticky top-0 h-screen"
         />
       </div>
@@ -64,10 +88,10 @@ export function AppShell({
             </button>
             <Sidebar
               role={role}
-              user={user}
+              user={effectiveUser}
               activePath={activePath}
               onNavigate={() => setMobileMenuOpen(false)}
-              onLogout={onLogout}
+              onLogout={handleDefaultLogout}
               className="h-full border-r-0"
             />
           </div>
@@ -78,7 +102,7 @@ export function AppShell({
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
           role={role}
-          user={user}
+          user={effectiveUser}
           title={topbarTitle}
           subtitle={topbarSubtitle}
           onOpenMobileMenu={() => setMobileMenuOpen(true)}
