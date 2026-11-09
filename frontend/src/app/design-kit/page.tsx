@@ -12,6 +12,9 @@ import {
   ArrowRight,
   HardHat,
   ShieldCheck,
+  LogIn,
+  LogOut,
+  Bot,
 } from "lucide-react";
 import {
   Button,
@@ -50,6 +53,17 @@ import {
   formatTicket,
   normalizeTicketInput,
 } from "@/lib/format";
+import {
+  reportsApi,
+  adminApi,
+  officerApi,
+  chatbotApi,
+  ApiError,
+  isMockEnabled,
+} from "@/lib/api";
+import { useAuth } from "@/lib/auth";
+import { haversine, formatDistanceKm } from "@/lib/geo";
+import type { ChatbotResponse, TrackedReport } from "@/lib/types";
 
 type ShellPreviewMode = "public" | "admin" | "petugas";
 
@@ -77,6 +91,7 @@ const SAMPLE_TIMELINE: TimelineEntry[] = [
 
 export default function DesignKitPage() {
   const { success, error, info } = useToast();
+  const { user, isReady, login, logout } = useAuth();
   const [shellMode, setShellMode] = useState<ShellPreviewMode>("public");
   const [stepperStatus, setStepperStatus] =
     useState<ReportStatus>("diproses");
@@ -84,16 +99,135 @@ export default function DesignKitPage() {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [ticketInputDemo, setTicketInputDemo] = useState(" #adu-204 ");
 
+  // State untuk uji API & Mock Step 2
+  const [apiLoading, setApiLoading] = useState(false);
+  const [trackedResult, setTrackedResult] = useState<TrackedReport | null>(
+    null
+  );
+  const [chatResult, setChatResult] = useState<ChatbotResponse | null>(null);
+  const [authLoading, setAuthLoading] = useState(false);
+
+  async function handleTestTrack(ticketId: string) {
+    setApiLoading(true);
+    try {
+      const data = await reportsApi.trackReport(ticketId);
+      setTrackedResult(data);
+      success(
+        `Berhasil memuat ${formatTicket(data.ticket_id)}`,
+        `Status saat ini: ${data.status_label}`
+      );
+    } catch (err) {
+      const msg =
+        err instanceof ApiError ? err.message : "Gagal memuat tiket.";
+      error("Gagal Lacak Tiket", msg);
+    } finally {
+      setApiLoading(false);
+    }
+  }
+
+  async function handleTestStatefulApprove() {
+    setApiLoading(true);
+    try {
+      await adminApi.approve("ADU-204", {
+        category: "jalan_rusak",
+        urgency: "darurat",
+        note: "Disetujui dari halaman uji kit (stateful mock).",
+      });
+      const updated = await reportsApi.trackReport("ADU-204");
+      setTrackedResult(updated);
+      success(
+        "Laporan #ADU-204 disetujui!",
+        `Status berubah ke: ${updated.status_label}`
+      );
+    } catch (err) {
+      const msg =
+        err instanceof ApiError ? err.message : "Gagal menyetujui laporan.";
+      error("Konflik / Error API", msg);
+    } finally {
+      setApiLoading(false);
+    }
+  }
+
+  async function handleTestStatefulTake() {
+    setApiLoading(true);
+    try {
+      await officerApi.take("ADU-198");
+      const updated = await reportsApi.trackReport("ADU-198");
+      setTrackedResult(updated);
+      success(
+        "Laporan #ADU-198 diambil petugas!",
+        `Status berubah ke: ${updated.status_label}`
+      );
+    } catch (err) {
+      const msg =
+        err instanceof ApiError ? err.message : "Gagal mengambil laporan.";
+      error("Konflik / Error API", msg);
+    } finally {
+      setApiLoading(false);
+    }
+  }
+
+  async function handleTestChatbot() {
+    setApiLoading(true);
+    try {
+      const res = await chatbotApi.sendMessage({
+        message: "Cek laporan saya #ADU-891",
+      });
+      setChatResult(res);
+      success(
+        "Balasan Chatbot AI diterima",
+        `Membawa ${res.tickets.length} kartu tiket.`
+      );
+    } catch (err) {
+      const msg =
+        err instanceof ApiError ? err.message : "Gagal menghubungi chatbot.";
+      error("Error Chatbot", msg);
+    } finally {
+      setApiLoading(false);
+    }
+  }
+
+  async function handleQuickLogin(email: string) {
+    setAuthLoading(true);
+    try {
+      const loggedIn = await login({ email, password: "password123" });
+      success(
+        `Login berhasil sebagai ${loggedIn.name}`,
+        `Role: ${loggedIn.role} (${loggedIn.position})`
+      );
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : "Gagal login.";
+      error("Login Gagal", msg);
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  async function handleQuickLogout() {
+    setAuthLoading(true);
+    try {
+      await logout();
+      info("Logout berhasil", "Token & data user dihapus dari localStorage.");
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  const demoDistanceKm = haversine(-6.2088, 106.8456, -6.2142, 106.8431);
+
   const kitContent = (
     <div className="space-y-10">
       {/* Banner Dev Only + Switcher Layout Shell */}
-      <Card variant="mint" className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <Card
+        variant="mint"
+        className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+      >
         <div className="space-y-1">
           <div className="inline-flex items-center gap-2 rounded-full bg-emerald-700 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
-            DEV ONLY · STEP 1
+            DEV ONLY · STEP 1 & STEP 2
           </div>
           <h2 className="text-base font-bold text-stone-900">
-            KawalWarga Design System & Layout Shell Showcase
+            KawalWarga Design System, Layout Shell & API Mock Showcase
           </h2>
           <p className="text-xs text-stone-600">
             Gunakan tombol di kanan untuk menguji tampilan{" "}
@@ -126,6 +260,181 @@ export default function DesignKitPage() {
           </Button>
         </div>
       </Card>
+
+      {/* STEP 2: Tes API Layer, Mock Stateful & Auth Context */}
+      <section className="space-y-3">
+        <Eyebrow>STEP 2 · TES API LAYER, STATEFUL MOCK & AUTH CONTEXT</Eyebrow>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <Card className="space-y-4">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-base font-bold text-stone-900">
+                Uji Lacak Laporan & Transisi Stateful
+              </h3>
+              <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
+                Mock: {isMockEnabled() ? "AKTIF" : "NONAKTIF"}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant="primary"
+                loading={apiLoading}
+                onClick={() => handleTestTrack("ADU-891")}
+              >
+                Tes API: Lacak #ADU-891 (Diproses)
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                loading={apiLoading}
+                onClick={() => handleTestTrack("ADU-204")}
+              >
+                Lacak #ADU-204 (Baru)
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                loading={apiLoading}
+                onClick={() => handleTestTrack("ADU-176")}
+              >
+                Lacak #ADU-176 (Selesai)
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                loading={apiLoading}
+                onClick={() => handleTestTrack("ADU-183")}
+              >
+                Lacak #ADU-183 (Ditolak)
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap gap-2 border-t border-stone-100 pt-3">
+              <Button
+                size="sm"
+                variant="secondary"
+                loading={apiLoading}
+                icon={<Check className="h-3.5 w-3.5 text-emerald-700" />}
+                onClick={handleTestStatefulApprove}
+              >
+                Simulasi Admin Setujui #ADU-204
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                loading={apiLoading}
+                icon={<HardHat className="h-3.5 w-3.5 text-orange-600" />}
+                onClick={handleTestStatefulTake}
+              >
+                Simulasi Petugas Ambil #ADU-198
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                loading={apiLoading}
+                icon={<Bot className="h-3.5 w-3.5 text-emerald-700" />}
+                onClick={handleTestChatbot}
+              >
+                Tes Chatbot (#ADU-891)
+              </Button>
+            </div>
+
+            {trackedResult && (
+              <div className="rounded-xl border border-stone-200 bg-stone-50 p-3.5 text-xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-stone-900">
+                    {formatTicket(trackedResult.ticket_id)} —{" "}
+                    {trackedResult.title}
+                  </span>
+                  <StatusChip status={trackedResult.status} size="sm" />
+                </div>
+                <p className="text-stone-600">{trackedResult.description}</p>
+                <p className="text-stone-500">
+                  Lokasi: {trackedResult.location.address_text} · Diterima:{" "}
+                  {formatDateTime(trackedResult.received_at)}
+                </p>
+              </div>
+            )}
+
+            {chatResult && (
+              <div className="rounded-xl border border-teal-200 bg-teal-50/70 p-3.5 text-xs space-y-2">
+                <p className="font-bold text-stone-900">
+                  Balasan Chatbot AI:
+                </p>
+                <p className="text-stone-700">{chatResult.reply}</p>
+                {chatResult.tickets.map((t) => (
+                  <div
+                    key={t.ticket_id}
+                    className="flex items-center justify-between rounded-lg bg-white p-2 border border-stone-200"
+                  >
+                    <span className="font-semibold text-stone-900">
+                      {formatTicket(t.ticket_id)} · {t.title}
+                    </span>
+                    <StatusChip status={t.status} size="sm" />
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+
+          <Card className="space-y-4">
+            <h3 className="text-base font-bold text-stone-900">
+              Uji Auth Context (localStorage kw_token & kw_user)
+            </h3>
+            <div className="rounded-xl border border-stone-200 bg-stone-50 p-3.5 text-xs space-y-1.5">
+              <p>
+                <span className="text-stone-500">isReady:</span>{" "}
+                <strong>{isReady ? "true" : "false"}</strong>
+              </p>
+              <p>
+                <span className="text-stone-500">User aktif:</span>{" "}
+                <strong>
+                  {user
+                    ? `${user.name} (${user.role} — ${user.position})`
+                    : "Belum login (Tamu)"}
+                </strong>
+              </p>
+              <p>
+                <span className="text-stone-500">Uji Haversine (geo.ts):</span>{" "}
+                <strong>{formatDistanceKm(demoDistanceKm)}</strong>
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant="primary"
+                loading={authLoading}
+                icon={<LogIn className="h-3.5 w-3.5" />}
+                onClick={() => handleQuickLogin("admin@kawalwarga.test")}
+              >
+                Login Admin (Nadia Putri)
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                loading={authLoading}
+                icon={<LogIn className="h-3.5 w-3.5" />}
+                onClick={() => handleQuickLogin("budi@kawalwarga.test")}
+              >
+                Login Petugas (Budi Santoso)
+              </Button>
+              {user && (
+                <Button
+                  size="sm"
+                  variant="danger-outline"
+                  loading={authLoading}
+                  icon={<LogOut className="h-3.5 w-3.5" />}
+                  onClick={handleQuickLogout}
+                >
+                  Logout
+                </Button>
+              )}
+            </div>
+          </Card>
+        </div>
+      </section>
 
       {/* 1. Eyebrow & PageHeading */}
       <section className="space-y-4">
@@ -550,6 +859,11 @@ export default function DesignKitPage() {
     return (
       <AppShell
         role={role}
+        user={
+          user && user.role === role
+            ? { name: user.name, position: user.position, role: user.role }
+            : undefined
+        }
         activePath={role === "admin" ? "/admin" : "/petugas"}
         onLogout={() => {
           info("Kembali ke tampilan Layout Publik");
