@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Api\V1\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HealthController;
@@ -33,6 +34,11 @@ Route::prefix('v1')->group(function () {
         Route::post('/reports/{ticket_id}/approve', [AdminReportController::class, 'approve']);
         Route::post('/reports/{ticket_id}/reject', [AdminReportController::class, 'reject']);
         Route::post('/reports/{ticket_id}/reanalyze', [AdminReportController::class, 'reanalyze']);
+
+        Route::get('/dashboard/summary', [AdminDashboardController::class, 'summary']);
+        Route::get('/dashboard/map', [AdminDashboardController::class, 'map']);
+        Route::get('/dashboard/ai-insight', [AdminDashboardController::class, 'aiInsight']);
+        Route::post('/dashboard/ai-insight/regenerate', [AdminDashboardController::class, 'regenerateAiInsight']);
     });
 
     // Endpoint Petugas (role: petugas)

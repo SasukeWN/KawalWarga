@@ -38,6 +38,8 @@ class Report extends Model
         'completion_notes',
         'completion_photo_path',
         'completed_at',
+        'created_at',
+        'updated_at',
     ];
 
     protected function casts(): array
