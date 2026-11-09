@@ -140,24 +140,21 @@ export default function MapViewInner({
                       className="h-12 w-14 shrink-0 rounded-lg border border-stone-200 object-cover"
                     />
                     <div className="min-w-0">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
+                      <p className="truncate text-sm font-bold text-stone-900">
                         {pin.category_label}
                       </p>
-                      <p className="truncate text-xs font-extrabold text-stone-900">
+                      <p className="truncate text-xs text-stone-500">
                         {formatTicket(pin.ticket_id)}
-                      </p>
-                      <p className="truncate text-[11px] text-stone-600">
-                        {pin.title}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between gap-2 border-t border-stone-100 pt-2">
+                  <div className="space-y-2 border-t border-stone-100 pt-2">
                     <StatusChip status={pin.status} size="sm" />
                     <Link
                       href={`${detailBaseHref}?id=${encodeURIComponent(pin.ticket_id)}`}
-                      className="text-[11px] font-bold text-emerald-800 hover:text-emerald-950"
+                      className="block text-[11px] font-bold text-emerald-800 hover:text-emerald-950"
                     >
-                      Lihat detail →
+                      Lihat detail laporan →
                     </Link>
                   </div>
                 </div>
