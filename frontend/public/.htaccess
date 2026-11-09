@@ -1,0 +1,21 @@
+# KawalWarga - Static Export Apache Configuration (.htaccess)
+# Tempatkan file ini di root public_html bersama seluruh isi out/
+
+Options -Indexes
+
+# Error Document 404 untuk halaman tidak ditemukan
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Paksa HTTPS di production
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP_HOST} !^localhost [NC]
+    RewriteCond %{HTTP_HOST} !^127\.0\.0\.1
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Pastikan routing folder dengan trailing slash bekerja optimal
+    DirectorySlash On
+    DirectoryIndex index.html
+</IfModule>
