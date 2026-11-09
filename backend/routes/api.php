@@ -12,6 +12,7 @@ Route::prefix('v1')->group(function () {
 
     // Endpoint Publik (Warga)
     Route::post('/reports', [PublicReportController::class, 'store'])->middleware('throttle:reports');
+    Route::get('/reports/track/{ticket_id}', [PublicReportController::class, 'track']);
 
     // Autentikasi
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
