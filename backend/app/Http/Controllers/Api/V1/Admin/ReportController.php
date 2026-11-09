@@ -42,11 +42,11 @@ class ReportController extends Controller
         }
 
         if ($request->filled('category')) {
-            $query->where('category', $request->input('category'));
+            $query->whereRaw('COALESCE(category, ai_category) = ?', [(string) $request->input('category')]);
         }
 
         if ($request->filled('urgency')) {
-            $query->where('urgency', $request->input('urgency'));
+            $query->whereRaw('COALESCE(urgency, ai_urgency) = ?', [(string) $request->input('urgency')]);
         }
 
         if ($request->filled('from')) {
@@ -63,7 +63,7 @@ class ReportController extends Controller
         if ($sort === 'oldest') {
             $query->orderBy('created_at', 'asc')->orderBy('id', 'asc');
         } elseif ($sort === 'urgency') {
-            $query->orderByRaw(Urgency::sqlWeightCase('urgency').' DESC')
+            $query->orderByRaw(Urgency::sqlWeightCase('COALESCE(urgency, ai_urgency)').' DESC')
                 ->orderBy('created_at', 'desc')
                 ->orderBy('id', 'desc');
         } else {

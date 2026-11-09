@@ -95,10 +95,10 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // Semua exception lain → 500 (tanpa stack trace di production)
+        // Semua exception lain → 500 (tanpa stack trace di production atau saat APP_DEBUG=false)
         $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
-                $message = app()->isProduction()
+                $message = (! config('app.debug') || app()->isProduction())
                     ? 'Terjadi kesalahan pada server. Silakan coba lagi.'
                     : $e->getMessage();
 

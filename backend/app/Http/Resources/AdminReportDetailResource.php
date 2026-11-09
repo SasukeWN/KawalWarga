@@ -22,13 +22,15 @@ class AdminReportDetailResource extends JsonResource
             ? $this->status
             : ReportStatus::from((string) $this->status);
 
-        $category = $this->category instanceof Category
-            ? $this->category
-            : ($this->category ? Category::tryFrom((string) $this->category) : null);
+        $rawCategory = $this->category ?? $this->ai_category;
+        $category    = $rawCategory instanceof Category
+            ? $rawCategory
+            : ($rawCategory ? Category::tryFrom((string) $rawCategory) : null);
 
-        $urgency = $this->urgency instanceof Urgency
-            ? $this->urgency
-            : ($this->urgency ? Urgency::tryFrom((string) $this->urgency) : null);
+        $rawUrgency = $this->urgency ?? $this->ai_urgency;
+        $urgency    = $rawUrgency instanceof Urgency
+            ? $rawUrgency
+            : ($rawUrgency ? Urgency::tryFrom((string) $rawUrgency) : null);
 
         $aiCategory = $this->ai_category instanceof Category
             ? $this->ai_category

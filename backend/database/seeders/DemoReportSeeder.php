@@ -143,7 +143,7 @@ class DemoReportSeeder extends Seeder
                         'event'       => EventType::VERIFIED->value,
                         'title'       => EventType::VERIFIED->label(),
                         'description' => 'Admin menyetujui laporan. Menunggu Penanganan.',
-                        'note'        => $verificationNote,
+                        'note'        => null,
                         'actor_id'    => $admin->id,
                         'created_at'  => $verifiedAt->copy(),
                     ];
@@ -166,7 +166,7 @@ class DemoReportSeeder extends Seeder
                         'event'       => EventType::VERIFIED->value,
                         'title'       => EventType::VERIFIED->label(),
                         'description' => 'Admin menyetujui laporan. Menunggu Penanganan.',
-                        'note'        => $verificationNote,
+                        'note'        => null,
                         'actor_id'    => $admin->id,
                         'created_at'  => $verifiedAt->copy(),
                     ];
@@ -207,7 +207,7 @@ class DemoReportSeeder extends Seeder
                         'event'       => EventType::VERIFIED->value,
                         'title'       => EventType::VERIFIED->label(),
                         'description' => 'Admin menyetujui laporan. Menunggu Penanganan.',
-                        'note'        => $verificationNote,
+                        'note'        => null,
                         'actor_id'    => $admin->id,
                         'created_at'  => $verifiedAt->copy(),
                     ];
@@ -222,8 +222,8 @@ class DemoReportSeeder extends Seeder
                     $eventsToInsert[] = [
                         'event'       => EventType::COMPLETED->value,
                         'title'       => EventType::COMPLETED->label(),
-                        'description' => $completionNotes,
-                        'note'        => $completionNotes,
+                        'description' => "Bukti penanganan telah diunggah oleh {$budi->name}.",
+                        'note'        => null,
                         'actor_id'    => $budi->id,
                         'created_at'  => $completedAt->copy(),
                     ];
@@ -239,8 +239,8 @@ class DemoReportSeeder extends Seeder
                     $eventsToInsert[] = [
                         'event'       => EventType::REJECTED->value,
                         'title'       => EventType::REJECTED->label(),
-                        'description' => $rejectionReason,
-                        'note'        => $rejectionReason,
+                        'description' => 'Laporan tidak dapat diteruskan.',
+                        'note'        => null,
                         'actor_id'    => $admin->id,
                         'created_at'  => $rejectedAt->copy(),
                     ];

@@ -49,11 +49,11 @@ class InsightService
             + $totals['ditolak'];
 
         $categoryRows = Report::query()
-            ->select('category', DB::raw('COUNT(*) as aggregate'))
+            ->select(DB::raw('COALESCE(category, ai_category) as effective_category'), DB::raw('COUNT(*) as aggregate'))
             ->whereBetween('created_at', [$start, $end])
-            ->whereNotNull('category')
-            ->groupBy('category')
-            ->pluck('aggregate', 'category');
+            ->whereRaw('COALESCE(category, ai_category) IS NOT NULL')
+            ->groupBy('effective_category')
+            ->pluck('aggregate', 'effective_category');
 
         $byCategory = [];
         foreach (Category::cases() as $cat) {
