@@ -18,8 +18,10 @@ Isi variabel environment:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
-NEXT_PUBLIC_USE_MOCK=true
+NEXT_PUBLIC_USE_MOCK=false
 ```
+
+> Ubah `NEXT_PUBLIC_USE_MOCK=true` bila ingin menjalankan frontend menggunakan data mock lokal (`src/mocks/`) tanpa server backend.
 
 ## Cara Menjalankan (Development)
 

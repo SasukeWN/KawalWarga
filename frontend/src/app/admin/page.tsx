@@ -53,7 +53,7 @@ function toIsoDate(date: Date): string {
 function getDefaultRange(): DateRange {
   const today = new Date();
   const start = new Date(today);
-  start.setDate(today.getDate() - 6);
+  start.setDate(today.getDate() - 7);
   return { from: toIsoDate(start), to: toIsoDate(today) };
 }
 

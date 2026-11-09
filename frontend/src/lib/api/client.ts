@@ -22,7 +22,7 @@ export class ApiError extends Error {
 export function isMockEnabled(): boolean {
   const flag = process.env.NEXT_PUBLIC_USE_MOCK;
   if (flag === undefined || flag === "") {
-    return true;
+    return false;
   }
   return flag.toLowerCase() === "true" || flag === "1";
 }
