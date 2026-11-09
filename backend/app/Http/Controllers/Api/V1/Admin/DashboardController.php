@@ -50,9 +50,10 @@ class DashboardController extends Controller
                 ? $report->status
                 : ReportStatus::from((string) $report->status);
 
-            $category = $report->category instanceof Category
-                ? $report->category
-                : ($report->category ? Category::tryFrom((string) $report->category) : null);
+            $rawCategory = $report->category ?? $report->ai_category;
+            $category    = $rawCategory instanceof Category
+                ? $rawCategory
+                : ($rawCategory ? Category::tryFrom((string) $rawCategory) : null);
 
             return [
                 'ticket_id'      => $report->ticket_id,

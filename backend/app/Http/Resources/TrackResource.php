@@ -22,8 +22,9 @@ class TrackResource extends JsonResource
 
         $isUnverified = $status === ReportStatus::MENUNGGU_VERIFIKASI;
 
-        $categoryEnum = (! $isUnverified && $this->category)
-            ? ($this->category instanceof Category ? $this->category : Category::tryFrom((string) $this->category))
+        $rawCategory  = $this->category ?? $this->ai_category;
+        $categoryEnum = (! $isUnverified && $rawCategory)
+            ? ($rawCategory instanceof Category ? $rawCategory : Category::tryFrom((string) $rawCategory))
             : null;
 
         /** @var \Illuminate\Support\Collection<int, ReportEvent> $events */
