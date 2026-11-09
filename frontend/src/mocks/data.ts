@@ -114,7 +114,7 @@ const INITIAL_REPORTS: InternalMockReport[] = [
       longitude: 106.8456,
       address_text: "Jl. Melati No. 12, Kel. Sukamaju, Kota Harmoni",
     },
-    reporter_phone: "081234567890",
+    reporter_phone: null,
     received_at: "2026-11-08T10:42:00+07:00",
     ai: {
       status: "done",
@@ -157,7 +157,7 @@ const INITIAL_REPORTS: InternalMockReport[] = [
       address_text: "Jl. Anggrek Raya No. 8, Kel. Sukamaju, Kota Harmoni",
     },
     reporter_phone: "081298765432",
-    received_at: "2026-11-08T09:50:00+07:00",
+    received_at: "2026-11-03T18:50:00+07:00",
     ai: {
       status: "done",
       summary:
@@ -193,7 +193,7 @@ const INITIAL_REPORTS: InternalMockReport[] = [
       address_text: "Jl. Kenanga Blok C2, Kel. Mekarjaya, Kota Harmoni",
     },
     reporter_phone: null,
-    received_at: "2026-11-08T08:15:00+07:00",
+    received_at: "2026-11-03T17:15:00+07:00",
     ai: {
       status: "done",
       summary:
@@ -373,7 +373,7 @@ const INITIAL_REPORTS: InternalMockReport[] = [
       address_text: "Jl. Merpati No. 5, Mekarjaya",
     },
     reporter_phone: "081566778899",
-    received_at: "2026-11-07T15:10:00+07:00",
+    received_at: "2026-11-03T15:10:00+07:00",
     ai: {
       status: "done",
       summary:
@@ -421,7 +421,7 @@ const INITIAL_REPORTS: InternalMockReport[] = [
       address_text: "Jl. Cemara No. 11, Sukamaju",
     },
     reporter_phone: null,
-    received_at: "2026-11-06T16:15:00+07:00",
+    received_at: "2026-11-03T12:15:00+07:00",
     ai: {
       status: "done",
       summary: "Tumpukan kantong sampah di samping fasilitas halte warga.",
@@ -468,7 +468,7 @@ const INITIAL_REPORTS: InternalMockReport[] = [
       address_text: "Jl. Kenari No. 3, Mekarjaya",
     },
     reporter_phone: "081234567890",
-    received_at: "2026-11-06T13:20:00+07:00",
+    received_at: "2026-11-03T10:20:00+07:00",
     ai: {
       status: "done",
       summary: "Gangguan ballast lampu penerangan di jalur pejalan kaki.",
@@ -577,7 +577,7 @@ const INITIAL_REPORTS: InternalMockReport[] = [
       address_text: "Jl. Taman Harmoni No. 9, Kel. Sukamaju, Kota Harmoni",
     },
     reporter_phone: "081298765432",
-    received_at: "2026-11-07T11:20:00+07:00",
+    received_at: "2026-11-03T09:20:00+07:00",
     ai: {
       status: "done",
       summary:
@@ -701,29 +701,29 @@ const INITIAL_REPORTS: InternalMockReport[] = [
   },
   {
     ticket_id: "ADU-172",
-    title: "Pengangkutan sampah menumpuk di Jl. Mawar",
+    title: "Lampu taman padam",
     status: "selesai",
     description:
-      "Tumpukan sampah pasca kerja bakti warga di Jl. Mawar No. 4 membutuhkan bantuan pengangkutan armada kebersihan dinas.",
-    photo_url: "/mock/sampah.png",
+      "Lampu taman di area Taman Melati padam pada malam hari sehingga jalur pejalan kaki warga menjadi gelap.",
+    photo_url: "/mock/lampu-mati.png",
     location: {
       latitude: -6.2104,
       longitude: 106.8529,
-      address_text: "Jl. Mawar No. 4, Kel. Sukamaju, Kota Harmoni",
+      address_text: "Taman Melati, Kel. Sukamaju, Kota Harmoni",
     },
     reporter_phone: "081388990011",
     received_at: "2026-11-04T10:15:00+07:00",
     ai: {
       status: "done",
-      summary: "Tumpukan karung sampah hasil kerja bakti warga di tepi jalan.",
-      category: "sampah",
-      urgency: "sedang",
+      summary: "Lampu penerangan di Taman Melati padam dan perlu penggantian komponen.",
+      category: "lampu_mati",
+      urgency: "rendah",
       duplicates: [],
     },
     verification: {
-      category: "sampah",
-      urgency: "sedang",
-      note: "Jadwalkan pengangkutan dengan truk rute Sukamaju.",
+      category: "lampu_mati",
+      urgency: "rendah",
+      note: "Ganti bohlam lampu taman pada jadwal pemeliharaan rutin.",
       verified_by: ADMIN_ACTOR,
       verified_at: "2026-11-04T11:30:00+07:00",
     },
@@ -920,7 +920,7 @@ const INITIAL_REPORTS: InternalMockReport[] = [
   },
   {
     ticket_id: "ADU-183",
-    title: "Sampah menumpuk di Jl. Batas",
+    title: "Sampah di luar wilayah",
     status: "ditolak",
     description:
       "Terdapat tumpukan sampah di tepi Jl. Batas No. 4, Kel. Seberang. Sampah sudah beberapa hari belum diangkut dan menimbulkan bau.",
@@ -937,7 +937,7 @@ const INITIAL_REPORTS: InternalMockReport[] = [
       summary:
         "Tumpukan sampah di Jl. Batas No. 4 yang berada di luar batas wilayah layanan instansi.",
       category: "sampah",
-      urgency: "sedang",
+      urgency: "rendah",
       duplicates: [],
     },
     verification: null,
