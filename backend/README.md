@@ -116,4 +116,5 @@ Untuk pengujian manual dari VS Code REST Client atau Thunder Client, gunakan fil
 ## 7. Referensi Dokumentasi
 - [API Contract v1.1 (`docs/API-Contract.md`)](../docs/API-Contract.md) — Acuan tunggal kontrak request/response antara Frontend dan Backend.
 - [Backend PRD (`docs/Backend-PRD.md`)](../docs/Backend-PRD.md) — Spesifikasi arsitektur, alur kerja, AI prompt, dan kriteria penerimaan backend.
+- [Panduan Deploy & Checklist Integrasi (`docs/DEPLOY.md`)](docs/DEPLOY.md) — Langkah deploy ke cPanel (`api.DOMAINKITA.com`), konfigurasi `.env` production, dan checklist uji akhir.
 - [API Smoke Test (`docs/api-smoke-test.http`)](docs/api-smoke-test.http) — Koleksi request uji manual seluruh endpoint dari awal sampai akhir.

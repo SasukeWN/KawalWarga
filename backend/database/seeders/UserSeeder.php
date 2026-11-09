@@ -11,11 +11,14 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        $adminPassword   = (string) env('DEMO_ADMIN_PASSWORD', 'password123');
+        $officerPassword = (string) env('DEMO_OFFICER_PASSWORD', 'password123');
+
         User::updateOrCreate(
             ['email' => 'admin@kawalwarga.test'],
             [
                 'name'     => 'Nadia Putri',
-                'password' => Hash::make('password123'),
+                'password' => Hash::make($adminPassword),
                 'role'     => Role::ADMIN->value,
                 'position' => 'Admin verifikator',
             ]
@@ -25,7 +28,7 @@ class UserSeeder extends Seeder
             ['email' => 'budi@kawalwarga.test'],
             [
                 'name'     => 'Budi Santoso',
-                'password' => Hash::make('password123'),
+                'password' => Hash::make($officerPassword),
                 'role'     => Role::PETUGAS->value,
                 'position' => 'Petugas lapangan',
             ]
