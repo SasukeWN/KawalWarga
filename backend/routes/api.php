@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\Officer\ReportController as OfficerReportController;
+use App\Http\Controllers\Api\V1\Public\ChatbotController;
 use App\Http\Controllers\Api\V1\Public\ReportController as PublicReportController;
 use App\Support\ApiResponse;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,7 @@ Route::prefix('v1')->group(function () {
     // Endpoint Publik (Warga)
     Route::post('/reports', [PublicReportController::class, 'store'])->middleware('throttle:reports');
     Route::get('/reports/track/{ticket_id}', [PublicReportController::class, 'track']);
+    Route::post('/chatbot', [ChatbotController::class, 'send'])->middleware('throttle:chatbot');
 
     // Autentikasi
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
