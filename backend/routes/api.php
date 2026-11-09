@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\Public\ReportController as PublicReportController;
@@ -25,6 +26,11 @@ Route::prefix('v1')->group(function () {
     // Endpoint Admin (role: admin)
     Route::prefix('admin')->middleware(['auth:sanctum', 'role:admin'])->group(function () {
         Route::get('/ping', fn () => ApiResponse::success(['role' => 'admin']));
+
+        Route::get('/reports', [AdminReportController::class, 'index']);
+        Route::get('/reports/{ticket_id}', [AdminReportController::class, 'show']);
+        Route::post('/reports/{ticket_id}/approve', [AdminReportController::class, 'approve']);
+        Route::post('/reports/{ticket_id}/reject', [AdminReportController::class, 'reject']);
     });
 
     // Endpoint Petugas (role: petugas)
