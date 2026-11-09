@@ -2,12 +2,16 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\Public\ReportController as PublicReportController;
 use App\Support\ApiResponse;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::get('/health', [HealthController::class, 'index']);
     Route::get('/health/ai', [HealthController::class, 'ai']);
+
+    // Endpoint Publik (Warga)
+    Route::post('/reports', [PublicReportController::class, 'store'])->middleware('throttle:reports');
 
     // Autentikasi
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
