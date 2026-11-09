@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { Leaf } from "lucide-react";
+import { ChatWidget, openChatWidget } from "@/components/chat";
 import { APP_CONFIG } from "@/lib/config";
 
 export interface PublicHeaderProps {
@@ -61,6 +62,7 @@ export function PublicHeader({ className }: PublicHeaderProps) {
             </Link>
             <Link
               href="/tanya-ai"
+              onClick={() => openChatWidget()}
               className={clsx(
                 "inline-flex h-10 items-center gap-2 rounded-xl border px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600",
                 isTanyaAiActive
@@ -90,6 +92,7 @@ export function PublicHeader({ className }: PublicHeaderProps) {
           </Link>
           <Link
             href="/tanya-ai"
+            onClick={() => openChatWidget()}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 py-1"
           >
             <Leaf className="h-3.5 w-3.5 text-emerald-700" aria-hidden="true" />
@@ -97,6 +100,9 @@ export function PublicHeader({ className }: PublicHeaderProps) {
           </Link>
         </nav>
       </div>
+
+      {/* Widget Melayang Tanya AI di seluruh halaman publik */}
+      <ChatWidget defaultOpen={Boolean(isTanyaAiActive)} />
     </header>
   );
 }

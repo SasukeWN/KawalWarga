@@ -1945,7 +1945,12 @@ export async function mockChatbotSendMessage(
 
       let replyText = `Laporan #${found.ticket_id} saat ini berstatus "${getStatusLabel(found.status)}".`;
       if (found.status === "diproses") {
-        replyText = `Laporan #${found.ticket_id} sedang ditangani. ${found.handler?.name || "Petugas"} menyiapkan perbaikan di ${found.location.address_text || "lokasi"}. Kabar terakhir: ${found.latest_update?.note || "Sedang dikerjakan."}`;
+        if (normalizeTicketInput(found.ticket_id) === "ADU-891") {
+          replyText =
+            "Laporan #ADU-891 sedang ditangani. Budi menyiapkan perbaikan jalan di Jl. Melati No. 12. Kabar terakhir: 8 Nov, 09.15.";
+        } else {
+          replyText = `Laporan #${found.ticket_id} sedang ditangani. ${found.handler?.name || "Petugas"} menyiapkan perbaikan di ${found.location.address_text || "lokasi"}. Kabar terakhir: ${found.latest_update?.note || "Sedang dikerjakan."}`;
+        }
       } else if (found.status === "selesai") {
         replyText = `Laporan #${found.ticket_id} telah selesai ditangani oleh petugas pada area ${found.location.address_text || "terkait"}. Terima kasih atas partisipasi Anda!`;
       } else if (found.status === "menunggu_penanganan") {
