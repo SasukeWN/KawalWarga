@@ -32,6 +32,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/reports/{ticket_id}', [AdminReportController::class, 'show']);
         Route::post('/reports/{ticket_id}/approve', [AdminReportController::class, 'approve']);
         Route::post('/reports/{ticket_id}/reject', [AdminReportController::class, 'reject']);
+        Route::post('/reports/{ticket_id}/reanalyze', [AdminReportController::class, 'reanalyze']);
     });
 
     // Endpoint Petugas (role: petugas)

@@ -10,6 +10,7 @@ use App\Http\Requests\RejectReportRequest;
 use App\Http\Resources\AdminReportDetailResource;
 use App\Http\Resources\AdminReportListResource;
 use App\Models\Report;
+use App\Services\Ai\ReportAnalyzer;
 use App\Services\ReportWorkflow;
 use App\Services\TicketService;
 use App\Support\ApiResponse;
@@ -147,6 +148,24 @@ class ReportController extends Controller
             (new AdminReportDetailResource($updated))->resolve($request),
             'Laporan berhasil ditolak.'
         );
+    }
+
+    /**
+     * POST /api/v1/admin/reports/{ticket_id}/reanalyze
+     * Jalankan ulang analisis AI untuk laporan tanpa mengubah statusnya.
+     */
+    public function reanalyze(
+        Request $request,
+        string $ticket_id,
+        ReportAnalyzer $analyzer
+    ): JsonResponse {
+        $report  = $this->findByTicketOrFail($ticket_id);
+        $updated = $analyzer->analyze($report);
+        $updated->loadMissing('duplicates.duplicateOf');
+
+        $detail = (new AdminReportDetailResource($updated))->resolve($request);
+
+        return ApiResponse::success($detail['ai'], 'Analisis ulang selesai.');
     }
 
     /**
