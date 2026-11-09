@@ -12,8 +12,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: `${APP_CONFIG.appName} — Layanan Pengaduan Masyarakat`,
+  title: {
+    default: `${APP_CONFIG.appName} — Layanan Pengaduan Masyarakat`,
+    template: `%s · ${APP_CONFIG.appName}`,
+  },
   description: `Platform pengaduan publik berbasis AI untuk ${APP_CONFIG.agencyName} ${APP_CONFIG.regionName}.`,
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

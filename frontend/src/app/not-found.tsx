@@ -4,6 +4,7 @@ import { APP_CONFIG } from "@/lib/config";
 export default function NotFound() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4 py-16">
+      <title>{`Halaman Tidak Ditemukan · ${APP_CONFIG.appName}`}</title>
       <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-white p-6 md:p-8 shadow-sm text-center">
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 font-bold text-lg">
           404
