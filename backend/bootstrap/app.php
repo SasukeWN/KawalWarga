@@ -11,6 +11,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Exceptions\InvalidSignatureException;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
@@ -47,10 +48,16 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // AuthorizationException → 403
+        // AuthorizationException & AccessDeniedHttpException → 403
         $exceptions->render(function (AuthorizationException $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
-                return ApiResponse::error('Akses ditolak. Role tidak diizinkan.', 403);
+                return ApiResponse::error($e->getMessage() ?: 'Akses ditolak. Role tidak diizinkan.', 403);
+            }
+        });
+
+        $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return ApiResponse::error($e->getMessage() ?: 'Akses ditolak. Role tidak diizinkan.', 403);
             }
         });
 

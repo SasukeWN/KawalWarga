@@ -10,6 +10,7 @@ use App\Exceptions\ConflictException;
 use App\Models\Report;
 use App\Models\ReportEvent;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 
 class ReportWorkflow
@@ -175,6 +176,140 @@ class ReportWorkflow
             return $locked->fresh([
                 'events.actor',
                 'duplicates.duplicateOf',
+                'verifier',
+                'rejecter',
+                'handler',
+            ]);
+        });
+    }
+
+    /**
+     * Ambil laporan oleh petugas (transisi menunggu_penanganan -> diproses)
+     * menggunakan update atomik anti-balapan sesuai PRD 5.3.
+     */
+    public function take(Report $report, User $officer): Report
+    {
+        return DB::transaction(function () use ($report, $officer): Report {
+            $now = now();
+
+            $affected = Report::where('id', $report->id)
+                ->where('status', ReportStatus::MENUNGGU_PENANGANAN->value)
+                ->whereNull('handler_id')
+                ->update([
+                    'status'     => ReportStatus::DIPROSES->value,
+                    'handler_id' => $officer->id,
+                    'taken_at'   => $now,
+                    'updated_at' => $now,
+                ]);
+
+            if ($affected === 0) {
+                throw new ConflictException('Laporan sudah diambil petugas lain.');
+            }
+
+            ReportEvent::create([
+                'report_id'   => $report->id,
+                'event'       => EventType::TAKEN,
+                'title'       => EventType::TAKEN->label(),
+                'description' => "{$officer->name} mulai menangani laporan.",
+                'actor_id'    => $officer->id,
+                'created_at'  => $now,
+            ]);
+
+            return $report->fresh([
+                'events.actor',
+                'verifier',
+                'rejecter',
+                'handler',
+            ]);
+        });
+    }
+
+    /**
+     * Tambahkan catatan progres penanganan oleh petugas yang menangani laporan.
+     */
+    public function addProgress(Report $report, User $officer, string $note): Report
+    {
+        return DB::transaction(function () use ($report, $officer, $note): Report {
+            $locked = Report::whereKey($report->id)->lockForUpdate()->firstOrFail();
+
+            if ((int) $locked->handler_id !== (int) $officer->id) {
+                throw new AuthorizationException('Hanya petugas yang menangani laporan ini yang dapat memperbarui progres.');
+            }
+
+            $currentStatus = $locked->status instanceof ReportStatus
+                ? $locked->status
+                : ReportStatus::from((string) $locked->status);
+
+            if ($currentStatus !== ReportStatus::DIPROSES) {
+                throw new ConflictException('Pembaruan progres hanya dapat ditambahkan pada laporan yang sedang diproses.');
+            }
+
+            $cleanedNote = trim($note);
+            $now         = now();
+
+            ReportEvent::create([
+                'report_id'   => $locked->id,
+                'event'       => EventType::PROGRESS,
+                'title'       => EventType::PROGRESS->label(),
+                'description' => $cleanedNote,
+                'note'        => $cleanedNote,
+                'actor_id'    => $officer->id,
+                'created_at'  => $now,
+            ]);
+
+            return $locked->fresh([
+                'events.actor',
+                'verifier',
+                'rejecter',
+                'handler',
+            ]);
+        });
+    }
+
+    /**
+     * Selesaikan laporan dengan catatan dan foto bukti oleh petugas yang menangani.
+     */
+    public function complete(
+        Report $report,
+        User $officer,
+        string $notes,
+        string $completionPhotoPath
+    ): Report {
+        return DB::transaction(function () use ($report, $officer, $notes, $completionPhotoPath): Report {
+            $locked = Report::whereKey($report->id)->lockForUpdate()->firstOrFail();
+
+            if ((int) $locked->handler_id !== (int) $officer->id) {
+                throw new AuthorizationException('Hanya petugas yang menangani laporan ini yang dapat menyelesaikan laporan.');
+            }
+
+            $currentStatus = $locked->status instanceof ReportStatus
+                ? $locked->status
+                : ReportStatus::from((string) $locked->status);
+
+            if ($currentStatus !== ReportStatus::DIPROSES) {
+                throw new ConflictException('Laporan hanya dapat diselesaikan saat berstatus diproses.');
+            }
+
+            $now = now();
+
+            $locked->update([
+                'completion_notes'      => trim($notes),
+                'completion_photo_path' => $completionPhotoPath,
+                'completed_at'          => $now,
+                'status'                => ReportStatus::SELESAI,
+            ]);
+
+            ReportEvent::create([
+                'report_id'   => $locked->id,
+                'event'       => EventType::COMPLETED,
+                'title'       => EventType::COMPLETED->label(),
+                'description' => "Bukti penanganan telah diunggah oleh {$officer->name}.",
+                'actor_id'    => $officer->id,
+                'created_at'  => $now,
+            ]);
+
+            return $locked->fresh([
+                'events.actor',
                 'verifier',
                 'rejecter',
                 'handler',

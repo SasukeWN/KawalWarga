@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\Officer\ReportController as OfficerReportController;
 use App\Http\Controllers\Api\V1\Public\ReportController as PublicReportController;
 use App\Support\ApiResponse;
 use Illuminate\Support\Facades\Route;
@@ -36,5 +37,12 @@ Route::prefix('v1')->group(function () {
     // Endpoint Petugas (role: petugas)
     Route::prefix('officer')->middleware(['auth:sanctum', 'role:petugas'])->group(function () {
         Route::get('/ping', fn () => ApiResponse::success(['role' => 'petugas']));
+
+        Route::get('/queue', [OfficerReportController::class, 'queue']);
+        Route::get('/my-reports', [OfficerReportController::class, 'myReports']);
+        Route::get('/reports/{ticket_id}', [OfficerReportController::class, 'show']);
+        Route::post('/reports/{ticket_id}/take', [OfficerReportController::class, 'take']);
+        Route::post('/reports/{ticket_id}/progress', [OfficerReportController::class, 'progress']);
+        Route::post('/reports/{ticket_id}/complete', [OfficerReportController::class, 'complete']);
     });
 });
