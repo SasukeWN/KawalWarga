@@ -51,16 +51,25 @@ export function Stepper({ status, className }: StepperProps) {
                 index + 1
               )}
             </span>
-            <span
-              className={clsx(
-                "text-xs md:text-sm",
-                isCompleted || isActive
-                  ? "font-bold text-emerald-900"
-                  : "font-medium text-stone-500"
-              )}
-            >
-              {step.label}
-            </span>
+            <div className="min-w-0">
+              <span
+                className={clsx(
+                  "block text-xs md:text-sm",
+                  isCompleted || isActive
+                    ? "font-bold text-emerald-900"
+                    : "font-medium text-stone-500"
+                )}
+              >
+                {step.label}
+              </span>
+              <span className="block text-[11px] text-stone-500 md:hidden">
+                {isCompleted
+                  ? "Sudah dilalui"
+                  : isActive
+                    ? "Tahap saat ini"
+                    : "Menunggu penyelesaian"}
+              </span>
+            </div>
           </li>
         );
       })}

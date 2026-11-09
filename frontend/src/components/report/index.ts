@@ -9,6 +9,10 @@ export {
   type TicketSearchBoxProps,
 } from "./TicketSearchBox";
 export {
+  ReportSummaryCard,
+  type ReportSummaryCardProps,
+} from "./ReportSummaryCard";
+export {
   ReportForm,
   LAST_TICKET_STORAGE_KEY,
   LAST_TICKET_META_STORAGE_KEY,

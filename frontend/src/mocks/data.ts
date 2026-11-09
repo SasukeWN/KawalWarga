@@ -534,22 +534,22 @@ const INITIAL_REPORTS: InternalMockReport[] = [
   },
   {
     ticket_id: "ADU-176",
-    title: "Perbaikan lubang jalan di Jl. Dahlia",
+    title: "Perbaikan jalan di Jl. Kenanga",
     status: "selesai",
     description:
-      "Lubang cukup lebar di persimpangan Jl. Dahlia No. 18 membuat kendaraan harus melambat drastis dan sering memicu kemacetan pagi hari.",
+      "Lubang cukup lebar di permukaan jalan Jl. Kenanga No. 8 membuat kendaraan harus melambat drastis dan membahayakan pengendara saat malam hari.",
     photo_url: "/mock/jalan-rusak.png",
     location: {
       latitude: -6.2072,
       longitude: 106.8384,
-      address_text: "Jl. Dahlia No. 18, Kel. Mekarjaya, Kota Harmoni",
+      address_text: "Jl. Kenanga No. 8, Kel. Sukamaju, Kota Harmoni",
     },
     reporter_phone: "081234567890",
-    received_at: "2026-11-05T14:20:00+07:00",
+    received_at: "2026-11-05T10:20:00+07:00",
     ai: {
       status: "done",
       summary:
-        "Lubang jalan di persimpangan Jl. Dahlia mengganggu kelancaran lalu lintas warga.",
+        "Lubang jalan di Jl. Kenanga No. 8 mengganggu kelancaran lalu lintas warga.",
       category: "jalan_rusak",
       urgency: "tinggi",
       duplicates: [],
@@ -557,9 +557,9 @@ const INITIAL_REPORTS: InternalMockReport[] = [
     verification: {
       category: "jalan_rusak",
       urgency: "tinggi",
-      note: "Lakukan penambalan aspal dan perataan permukaan di titik persimpangan.",
+      note: "Lakukan penambalan aspal dan perataan permukaan di titik kerusakan.",
       verified_by: ADMIN_ACTOR,
-      verified_at: "2026-11-05T16:00:00+07:00",
+      verified_at: "2026-11-05T15:30:00+07:00",
     },
     rejection: null,
     handler: {
@@ -567,12 +567,13 @@ const INITIAL_REPORTS: InternalMockReport[] = [
       taken_at: "2026-11-06T09:00:00+07:00",
     },
     latest_update: {
-      note: "Lubang jalan sudah ditambal dengan aspal dingin dan dipadatkan.",
+      note: "Lubang jalan sudah ditambal dengan aspal dingin dan dipadatkan. Sisa material dibersihkan, jalan kembali dapat dilalui dengan aman.",
       actor: OFFICER_ACTOR,
       at: "2026-11-06T14:10:00+07:00",
     },
     completion: {
-      notes: "Lubang jalan sudah ditambal dengan aspal dingin dan dipadatkan.",
+      notes:
+        "Lubang jalan sudah ditambal dengan aspal dingin dan dipadatkan. Sisa material dibersihkan, jalan kembali dapat dilalui dengan aman.",
       photo_url: "/mock/jalan-selesai.png",
       completed_by: OFFICER_ACTOR,
       completed_at: "2026-11-06T14:10:00+07:00",
@@ -581,28 +582,26 @@ const INITIAL_REPORTS: InternalMockReport[] = [
       {
         event: "completed",
         title: "Selesai ditangani",
-        description:
-          "Lubang jalan sudah ditambal dengan aspal dingin dan dipadatkan.",
+        description: "Bukti penanganan telah diunggah oleh Budi Santoso.",
         at: "2026-11-06T14:10:00+07:00",
       },
       {
         event: "taken",
-        title: "Petugas mulai menangani",
-        description:
-          "Budi Santoso melakukan pengecekan dan persiapan perbaikan.",
+        title: "Pengerjaan dimulai",
+        description: "Petugas melakukan perbaikan jalan.",
         at: "2026-11-06T09:00:00+07:00",
       },
       {
         event: "verified",
-        title: "Laporan siap ditangani",
-        description: "Admin menyetujui laporan. Menunggu Penanganan.",
-        at: "2026-11-05T16:00:00+07:00",
+        title: "Laporan diverifikasi",
+        description: "Admin menyetujui laporan untuk ditangani.",
+        at: "2026-11-05T15:30:00+07:00",
       },
       {
         event: "submitted",
         title: "Laporan diterima",
-        description: "Laporan masuk dan menunggu verifikasi admin.",
-        at: "2026-11-05T14:20:00+07:00",
+        description: "Laporan warga masuk ke antrean verifikasi.",
+        at: "2026-11-05T10:20:00+07:00",
       },
     ],
   },
@@ -827,24 +826,24 @@ const INITIAL_REPORTS: InternalMockReport[] = [
   },
   {
     ticket_id: "ADU-183",
-    title: "Permintaan perbaikan pagar rumah pribadi",
+    title: "Sampah menumpuk di Jl. Batas",
     status: "ditolak",
     description:
-      "Mohon bantuan petugas untuk memperbaiki pagar halaman rumah pribadi saya di Jl. Kamboja No. 7 yang engselnya rusak karena angin kencang.",
-    photo_url: "/mock/jalan-rusak.png",
+      "Terdapat tumpukan sampah di tepi Jl. Batas No. 4, Kel. Seberang. Sampah sudah beberapa hari belum diangkut dan menimbulkan bau.",
+    photo_url: "/mock/sampah.png",
     location: {
       latitude: -6.2175,
       longitude: 106.8409,
-      address_text: "Jl. Kamboja No. 7, Kel. Luar Batas, Kota Harmoni",
+      address_text: "Jl. Batas No. 4, Kel. Seberang, di luar wilayah Kota Harmoni.",
     },
     reporter_phone: "081900112233",
-    received_at: "2026-11-06T10:05:00+07:00",
+    received_at: "2026-11-06T08:10:00+07:00",
     ai: {
       status: "done",
       summary:
-        "Laporan terkait perbaikan properti pribadi yang berada di luar cakupan prasarana umum.",
-      category: "jalan_rusak",
-      urgency: "rendah",
+        "Tumpukan sampah di Jl. Batas No. 4 yang berada di luar batas wilayah layanan instansi.",
+      category: "sampah",
+      urgency: "sedang",
       duplicates: [],
     },
     verification: null,
@@ -867,7 +866,7 @@ const INITIAL_REPORTS: InternalMockReport[] = [
         event: "submitted",
         title: "Laporan diterima",
         description: "Laporan masuk dan menunggu verifikasi admin.",
-        at: "2026-11-06T10:05:00+07:00",
+        at: "2026-11-06T08:10:00+07:00",
       },
     ],
   },
