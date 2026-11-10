@@ -2,8 +2,15 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowDownWideNarrow, Loader2, ShieldCheck } from "lucide-react";
 import {
+  ArrowDownWideNarrow,
+  ChevronDown,
+  Loader2,
+  Search,
+  ShieldCheck,
+} from "lucide-react";
+import {
+  Card,
   CardSkeleton,
   EmptyState,
   ErrorState,
@@ -11,19 +18,36 @@ import {
 } from "@/components/ui";
 import { OfficerReportCard, useOfficerLocation } from "@/components/report";
 import { useAuth } from "@/lib/auth";
-import { ApiError, officerApi } from "@/lib/api";
+import { ApiError, categoriesApi, officerApi } from "@/lib/api";
+import {
+  CATEGORY_OPTIONS,
+  registerCategoryLabels,
+  URGENCY_OPTIONS,
+  type ReportCategory,
+  type ReportUrgency,
+} from "@/lib/labels";
 import type {
   OfficerQueueSortOption,
   OfficerReportListItem,
 } from "@/lib/types";
 
-const PER_PAGE = 3;
+const PER_PAGE = 6;
 
 export default function OfficerQueuePage() {
   const { user } = useAuth();
   const officerCoords = useOfficerLocation();
   const firstName = user?.name?.trim().split(/\s+/)[0] || "Budi";
 
+  // Filter states
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<ReportCategory | "">("");
+  const [urgencyFilter, setUrgencyFilter] = useState<ReportUrgency | "">("");
+  const [categoryOptions, setCategoryOptions] = useState<
+    { value: string; label: string }[]
+  >(CATEGORY_OPTIONS);
+
+  // Data states
   const [items, setItems] = useState<OfficerReportListItem[]>([]);
   const [sort, setSort] = useState<OfficerQueueSortOption>("urgency");
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,10 +57,44 @@ export default function OfficerQueuePage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Load dynamic categories
+  useEffect(() => {
+    let isMounted = true;
+    categoriesApi
+      .listAll()
+      .then((cats) => {
+        if (!isMounted) return;
+        if (Array.isArray(cats) && cats.length > 0) {
+          const opts = cats.map((c) => ({ value: c.value, label: c.label }));
+          setCategoryOptions(opts);
+          registerCategoryLabels(opts);
+        }
+      })
+      .catch((err) => {
+        console.warn("Gagal memuat kategori petugas:", err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Debounce 400ms untuk pencarian ID tiket
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput.trim());
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
   const loadQueue = useCallback(
     async (
       targetPage: number,
       targetSort: OfficerQueueSortOption,
+      targetSearch: string,
+      targetCategory: ReportCategory | "",
+      targetUrgency: ReportUrgency | "",
       append: boolean
     ) => {
       if (append) {
@@ -49,6 +107,9 @@ export default function OfficerQueuePage() {
       try {
         const res = await officerApi.queue({
           sort: targetSort,
+          search: targetSearch || undefined,
+          category: targetCategory || undefined,
+          urgency: targetUrgency || undefined,
           page: targetPage,
           per_page: PER_PAGE,
         });
@@ -80,8 +141,8 @@ export default function OfficerQueuePage() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadQueue(1, sort, false);
-  }, [sort, loadQueue]);
+    loadQueue(1, sort, debouncedSearch, categoryFilter, urgencyFilter, false);
+  }, [sort, debouncedSearch, categoryFilter, urgencyFilter, loadQueue]);
 
   function handleToggleSort() {
     const nextSort: OfficerQueueSortOption =
@@ -91,8 +152,26 @@ export default function OfficerQueuePage() {
 
   function handleLoadMore() {
     if (loadingMore || currentPage >= lastPage) return;
-    loadQueue(currentPage + 1, sort, true);
+    loadQueue(
+      currentPage + 1,
+      sort,
+      debouncedSearch,
+      categoryFilter,
+      urgencyFilter,
+      true
+    );
   }
+
+  function handleResetFilters() {
+    setSearchInput("");
+    setDebouncedSearch("");
+    setCategoryFilter("");
+    setUrgencyFilter("");
+  }
+
+  const hasActiveFilter = Boolean(
+    debouncedSearch || categoryFilter || urgencyFilter
+  );
 
   return (
     <div className="space-y-6">
@@ -141,6 +220,125 @@ export default function OfficerQueuePage() {
         </span>
       </div>
 
+      {/* Kartu Filter */}
+      <Card className="space-y-3 p-4 sm:p-5">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {/* Cari ID Tiket */}
+          <div className="space-y-1.5">
+            <label
+              htmlFor="queue-search-id"
+              className="block text-xs font-bold text-stone-900"
+            >
+              Cari ID tiket
+            </label>
+            <div className="relative">
+              <input
+                id="queue-search-id"
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Ketik ID, mis. ADU-204"
+                className="h-11 w-full rounded-xl border border-stone-200 bg-white pl-3.5 pr-9 text-xs sm:text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              />
+              <Search
+                className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400"
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+
+          {/* Filter Kategori */}
+          <div className="space-y-1.5">
+            <label
+              htmlFor="queue-filter-category"
+              className="block text-xs font-bold text-stone-900"
+            >
+              Kategori
+            </label>
+            <div className="relative">
+              <select
+                id="queue-filter-category"
+                value={categoryFilter}
+                onChange={(e) =>
+                  setCategoryFilter(e.target.value as ReportCategory | "")
+                }
+                className="h-11 w-full appearance-none rounded-xl border border-stone-200 bg-white pl-3.5 pr-9 text-xs sm:text-sm text-stone-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              >
+                <option value="">Semua kategori</option>
+                {categoryOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500"
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+
+          {/* Filter Urgensi */}
+          <div className="space-y-1.5">
+            <label
+              htmlFor="queue-filter-urgency"
+              className="block text-xs font-bold text-stone-900"
+            >
+              Urgensi
+            </label>
+            <div className="relative">
+              <select
+                id="queue-filter-urgency"
+                value={urgencyFilter}
+                onChange={(e) =>
+                  setUrgencyFilter(e.target.value as ReportUrgency | "")
+                }
+                className="h-11 w-full appearance-none rounded-xl border border-stone-200 bg-white pl-3.5 pr-9 text-xs sm:text-sm text-stone-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              >
+                <option value="">Semua urgensi</option>
+                {URGENCY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500"
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+        </div>
+
+        {hasActiveFilter && (
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-stone-100 pt-2.5 text-xs text-stone-500">
+            <span>
+              Filter aktif:{" "}
+              {[
+                debouncedSearch ? `ID "${debouncedSearch}"` : null,
+                categoryFilter
+                  ? categoryOptions.find((c) => c.value === categoryFilter)
+                      ?.label || categoryFilter
+                  : null,
+                urgencyFilter
+                  ? URGENCY_OPTIONS.find((u) => u.value === urgencyFilter)
+                      ?.label || urgencyFilter
+                  : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </span>
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="font-semibold text-emerald-800 hover:text-emerald-950 hover:underline"
+            >
+              Atur ulang filter
+            </button>
+          </div>
+        )}
+      </Card>
+
       {/* Baris Kontrol & Urutan */}
       <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-stone-600">
@@ -177,7 +375,16 @@ export default function OfficerQueuePage() {
         <ErrorState
           title="Gagal memuat antrean penanganan"
           message={errorMsg}
-          onRetry={() => loadQueue(1, sort, false)}
+          onRetry={() =>
+            loadQueue(
+              1,
+              sort,
+              debouncedSearch,
+              categoryFilter,
+              urgencyFilter,
+              false
+            )
+          }
         />
       )}
 
@@ -185,8 +392,27 @@ export default function OfficerQueuePage() {
       {!loading && !errorMsg && items.length === 0 && (
         <EmptyState
           icon={<ShieldCheck className="h-6 w-6" />}
-          title="Belum ada laporan siap ditangani."
-          description="Seluruh laporan yang sudah diverifikasi saat ini telah diambil atau diselesaikan oleh petugas."
+          title={
+            hasActiveFilter
+              ? "Tidak ada laporan yang cocok."
+              : "Belum ada laporan siap ditangani."
+          }
+          description={
+            hasActiveFilter
+              ? "Coba ubah kata kunci pencarian ID atau sesuaikan filter kategori dan urgensi."
+              : "Seluruh laporan yang sudah diverifikasi saat ini telah diambil atau diselesaikan oleh petugas."
+          }
+          action={
+            hasActiveFilter ? (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="inline-flex h-10 items-center justify-center rounded-xl bg-emerald-700 px-4 text-xs font-semibold text-white transition-colors hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
+              >
+                Atur Ulang Filter
+              </button>
+            ) : undefined
+          }
         />
       )}
 

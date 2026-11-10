@@ -340,14 +340,19 @@ export interface DashboardAiInsight {
 export type OfficerQueueSortOption = "urgency" | "newest";
 
 export interface OfficerQueueParams {
-  sort?: OfficerQueueSortOption;
+  search?: string;
   category?: ReportCategory | "";
+  urgency?: ReportUrgency | "";
+  sort?: OfficerQueueSortOption;
   page?: number;
   per_page?: number;
 }
 
 export interface OfficerMyReportsParams {
+  search?: string;
   status?: "diproses" | "selesai" | "";
+  category?: ReportCategory | "";
+  urgency?: ReportUrgency | "";
   page?: number;
   per_page?: number;
 }

@@ -1836,9 +1836,24 @@ export async function mockOfficerQueue(
 
   let filtered = reportsStore.filter((r) => r.status === "menunggu_penanganan");
 
+  if (params.search) {
+    const q = normalizeTicketInput(params.search);
+    filtered = filtered.filter(
+      (r) =>
+        normalizeTicketInput(r.ticket_id).includes(q) ||
+        r.title.toLowerCase().includes(params.search!.toLowerCase())
+    );
+  }
+
   if (params.category) {
     filtered = filtered.filter(
       (r) => getEffectiveCategory(r) === params.category
+    );
+  }
+
+  if (params.urgency) {
+    filtered = filtered.filter(
+      (r) => getEffectiveUrgency(r) === params.urgency
     );
   }
 
@@ -1904,8 +1919,29 @@ export async function mockOfficerMyReports(
     (r) => r.status === "diproses" || r.status === "selesai"
   );
 
+  if (params.search) {
+    const q = normalizeTicketInput(params.search);
+    filtered = filtered.filter(
+      (r) =>
+        normalizeTicketInput(r.ticket_id).includes(q) ||
+        r.title.toLowerCase().includes(params.search!.toLowerCase())
+    );
+  }
+
   if (params.status) {
     filtered = filtered.filter((r) => r.status === params.status);
+  }
+
+  if (params.category) {
+    filtered = filtered.filter(
+      (r) => getEffectiveCategory(r) === params.category
+    );
+  }
+
+  if (params.urgency) {
+    filtered = filtered.filter(
+      (r) => getEffectiveUrgency(r) === params.urgency
+    );
   }
 
   filtered.sort((a, b) => {

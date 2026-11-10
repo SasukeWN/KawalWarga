@@ -30,8 +30,10 @@ export async function queue(
     {
       method: "GET",
       query: {
-        sort: params.sort,
+        search: params.search ? normalizeTicketInput(params.search) : undefined,
         category: params.category,
+        urgency: params.urgency,
+        sort: params.sort,
         page: params.page,
         per_page: params.per_page,
       },
@@ -61,7 +63,10 @@ export async function myReports(
     {
       method: "GET",
       query: {
+        search: params.search ? normalizeTicketInput(params.search) : undefined,
         status: params.status,
+        category: params.category,
+        urgency: params.urgency,
         page: params.page,
         per_page: params.per_page,
       },

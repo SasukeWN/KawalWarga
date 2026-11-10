@@ -296,4 +296,94 @@ class OfficerReportTest extends TestCase
 
         $this->assertCount(5, $trackRes->json('data.timeline'));
     }
+
+    public function test_officer_queue_and_my_reports_can_filter_by_ticket_urgency_and_category(): void
+    {
+        Report::create([
+            'ticket_id'   => 'ADU-101',
+            'title'       => 'Jalan berlubang besar',
+            'description' => 'Kerusakan jalan parah.',
+            'photo_path'  => 'reports/101.jpg',
+            'latitude'    => -6.2088,
+            'longitude'   => 106.8456,
+            'status'      => ReportStatus::MENUNGGU_PENANGANAN,
+            'category'    => Category::JALAN_RUSAK,
+            'urgency'     => Urgency::DARURAT,
+            'ai_status'   => 'done',
+            'verified_by' => $this->admin->id,
+            'verified_at' => now()->subHours(2),
+        ]);
+
+        Report::create([
+            'ticket_id'   => 'ADU-102',
+            'title'       => 'Sampah menumpuk',
+            'description' => 'Sampah bau.',
+            'photo_path'  => 'reports/102.jpg',
+            'latitude'    => -6.2088,
+            'longitude'   => 106.8456,
+            'status'      => ReportStatus::MENUNGGU_PENANGANAN,
+            'category'    => Category::SAMPAH,
+            'urgency'     => Urgency::SEDANG,
+            'ai_status'   => 'done',
+            'verified_by' => $this->admin->id,
+            'verified_at' => now()->subHour(),
+        ]);
+
+        Report::create([
+            'ticket_id'   => 'ADU-103',
+            'title'       => 'Lampu mati di taman',
+            'description' => 'Lampu taman gelap gulita.',
+            'photo_path'  => 'reports/103.jpg',
+            'latitude'    => -6.2088,
+            'longitude'   => 106.8456,
+            'status'      => ReportStatus::DIPROSES,
+            'category'    => Category::LAMPU_MATI,
+            'urgency'     => Urgency::TINGGI,
+            'ai_status'   => 'done',
+            'handler_id'  => $this->budi->id,
+            'taken_at'    => now()->subMinutes(30),
+        ]);
+
+        // 1. Filter queue by search ticket
+        $this->withHeader('Authorization', 'Bearer '.$this->budiToken)
+            ->getJson('/api/v1/officer/queue?search=101')
+            ->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.ticket_id', 'ADU-101');
+
+        // 2. Filter queue by category
+        $this->withHeader('Authorization', 'Bearer '.$this->budiToken)
+            ->getJson('/api/v1/officer/queue?category=sampah')
+            ->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.ticket_id', 'ADU-102');
+
+        // 3. Filter queue by urgency
+        $this->withHeader('Authorization', 'Bearer '.$this->budiToken)
+            ->getJson('/api/v1/officer/queue?urgency=darurat')
+            ->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.ticket_id', 'ADU-101');
+
+        // 4. Filter my-reports by search ticket
+        $this->withHeader('Authorization', 'Bearer '.$this->budiToken)
+            ->getJson('/api/v1/officer/my-reports?search=ADU-103')
+            ->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.ticket_id', 'ADU-103');
+
+        // 5. Filter my-reports by category
+        $this->withHeader('Authorization', 'Bearer '.$this->budiToken)
+            ->getJson('/api/v1/officer/my-reports?category=lampu_mati')
+            ->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.ticket_id', 'ADU-103');
+
+        // 6. Filter my-reports by urgency
+        $this->withHeader('Authorization', 'Bearer '.$this->budiToken)
+            ->getJson('/api/v1/officer/my-reports?urgency=tinggi')
+            ->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.ticket_id', 'ADU-103');
+    }
 }

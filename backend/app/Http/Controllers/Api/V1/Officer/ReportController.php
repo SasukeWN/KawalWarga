@@ -29,8 +29,10 @@ class ReportController extends Controller
     public function queue(Request $request): JsonResponse
     {
         $request->validate([
-            'sort'     => ['nullable', 'string', 'in:urgency,newest'],
+            'search'   => ['nullable', 'string', 'max:50'],
             'category' => ['nullable', 'string', Rule::exists('categories', 'slug')],
+            'urgency'  => ['nullable', 'string', Rule::enum(Urgency::class)],
+            'sort'     => ['nullable', 'string', 'in:urgency,newest'],
             'page'     => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ]);
@@ -39,8 +41,21 @@ class ReportController extends Controller
             ->where('status', ReportStatus::MENUNGGU_PENANGANAN->value)
             ->whereNull('handler_id');
 
+        if ($request->filled('search')) {
+            $normalized = TicketService::normalize((string) $request->input('search'));
+            if ($normalized) {
+                $query->where('ticket_id', $normalized);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        }
+
         if ($request->filled('category')) {
             $query->where('category', $request->input('category'));
+        }
+
+        if ($request->filled('urgency')) {
+            $query->where('urgency', $request->input('urgency'));
         }
 
         $sort = $request->input('sort', 'urgency');
@@ -75,7 +90,10 @@ class ReportController extends Controller
     public function myReports(Request $request): JsonResponse
     {
         $request->validate([
+            'search'   => ['nullable', 'string', 'max:50'],
             'status'   => ['nullable', 'string', 'in:diproses,selesai'],
+            'category' => ['nullable', 'string', Rule::exists('categories', 'slug')],
+            'urgency'  => ['nullable', 'string', Rule::enum(Urgency::class)],
             'page'     => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ]);
@@ -87,8 +105,25 @@ class ReportController extends Controller
                 ReportStatus::SELESAI->value,
             ]);
 
+        if ($request->filled('search')) {
+            $normalized = TicketService::normalize((string) $request->input('search'));
+            if ($normalized) {
+                $query->where('ticket_id', $normalized);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        }
+
         if ($request->filled('status')) {
             $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->input('category'));
+        }
+
+        if ($request->filled('urgency')) {
+            $query->where('urgency', $request->input('urgency'));
         }
 
         $query->orderBy('taken_at', 'desc')->orderBy('id', 'desc');
