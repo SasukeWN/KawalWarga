@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\Category;
 use App\Enums\ReportStatus;
 use App\Enums\Urgency;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +24,7 @@ class Report extends Model
         'urgency',
         'ai_status',
         'ai_category',
+        'reporter_category',
         'ai_urgency',
         'ai_summary',
         'verified_by',
@@ -48,9 +48,7 @@ class Report extends Model
             'latitude'     => 'float',
             'longitude'    => 'float',
             'status'       => ReportStatus::class,
-            'category'     => Category::class,
             'urgency'      => Urgency::class,
-            'ai_category'  => Category::class,
             'ai_urgency'   => Urgency::class,
             'verified_at'  => 'datetime',
             'rejected_at'  => 'datetime',
@@ -119,11 +117,7 @@ class Report extends Model
 
     public function getCategoryLabelAttribute(): ?string
     {
-        $category = $this->category instanceof Category
-            ? $this->category
-            : ($this->category ? Category::tryFrom((string) $this->category) : null);
-
-        return $category?->label();
+        return ReportCategory::labelFor($this->category);
     }
 
     public function getUrgencyLabelAttribute(): ?string

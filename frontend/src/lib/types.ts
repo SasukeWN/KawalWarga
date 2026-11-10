@@ -116,8 +116,34 @@ export interface CreateReportPayload {
   latitude: number;
   longitude: number;
   address_text?: string;
+  /** Kode kategori pilihan pelapor (opsional), dari GET /categories. */
+  category?: string;
   photo: File;
   reporter_phone?: string;
+}
+
+/** Kategori aktif yang boleh dipilih warga (GET /categories). */
+export interface CategoryOption {
+  value: string;
+  label: string;
+  description: string | null;
+}
+
+/** Kategori untuk pengelolaan admin (GET /admin/categories). */
+export interface AdminCategory extends CategoryOption {
+  is_active: boolean;
+  reports_count: number;
+}
+
+export interface CreateCategoryPayload {
+  label: string;
+  description?: string;
+}
+
+export interface UpdateCategoryPayload {
+  label?: string;
+  description?: string | null;
+  is_active?: boolean;
 }
 
 export interface CreatedReportResponse {

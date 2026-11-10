@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources;
 
-use App\Enums\Category;
 use App\Enums\ReportStatus;
+use App\Models\ReportCategory;
 use App\Enums\Urgency;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -19,10 +19,7 @@ class AdminReportListResource extends JsonResource
             ? $this->status
             : ReportStatus::from((string) $this->status);
 
-        $rawCategory = $this->category ?? $this->ai_category;
-        $category    = $rawCategory instanceof Category
-            ? $rawCategory
-            : ($rawCategory ? Category::tryFrom((string) $rawCategory) : null);
+        $category = ReportCategory::ref($this->category ?? $this->ai_category);
 
         $rawUrgency = $this->urgency ?? $this->ai_urgency;
         $urgency    = $rawUrgency instanceof Urgency

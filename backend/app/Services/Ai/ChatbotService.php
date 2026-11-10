@@ -2,9 +2,9 @@
 
 namespace App\Services\Ai;
 
-use App\Enums\Category;
 use App\Enums\ReportStatus;
 use App\Models\Report;
+use App\Models\ReportCategory;
 use App\Models\ReportEvent;
 use App\Services\ReportWorkflow;
 use App\Services\TicketService;
@@ -120,8 +120,9 @@ class ChatbotService
             if ($replyText === '') {
                 $replyText = self::FALLBACK_REPLY;
             }
-        } catch (\Throwable) {
-            $replyText = self::FALLBACK_REPLY;
+        } catch (\Throwable $e) {
+            $debugDetail = config('services.gemini.debug') ? "\n\n[Debug AI: " . $e->getMessage() . "]" : "";
+            $replyText = self::FALLBACK_REPLY . $debugDetail;
         }
 
         return [
@@ -210,7 +211,7 @@ class ChatbotService
 
         $isUnverified = $status === ReportStatus::MENUNGGU_VERIFIKASI;
         $category     = (! $isUnverified && $report->category)
-            ? ($report->category instanceof Category ? $report->category : Category::tryFrom((string) $report->category))
+            ? ReportCategory::ref($report->category)
             : null;
 
         /** @var \Illuminate\Support\Collection<int, ReportEvent> $events */

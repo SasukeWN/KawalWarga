@@ -5,7 +5,11 @@ export type ReportStatus =
   | "selesai"
   | "ditolak";
 
-export type ReportCategory = "jalan_rusak" | "sampah" | "lampu_mati";
+/**
+ * Kode kategori (slug) kini dinamis: admin dapat menambah kategori baru lewat
+ * halaman Kelola Kategori, sehingga tipe ini berupa string bebas.
+ */
+export type ReportCategory = string;
 
 export type ReportUrgency = "darurat" | "tinggi" | "sedang" | "rendah";
 
@@ -74,7 +78,7 @@ export interface CategoryStyleConfig {
   description: string;
 }
 
-export const CATEGORY_CONFIG: Record<ReportCategory, CategoryStyleConfig> = {
+export const CATEGORY_CONFIG: Record<string, CategoryStyleConfig> = {
   jalan_rusak: {
     label: "Jalan Rusak",
     description: "Lubang dan kerusakan jalan lingkungan.",
@@ -154,11 +158,34 @@ export function getStatusLabel(status: ReportStatus | null | undefined): string 
   return STATUS_CONFIG[status]?.label ?? status;
 }
 
+/** Label kategori yang diterima dari API (kategori buatan admin). */
+const dynamicCategoryLabels: Record<string, string> = {};
+
+export function registerCategoryLabels(
+  items: { value: string; label: string }[]
+): void {
+  for (const item of items) {
+    dynamicCategoryLabels[item.value] = item.label;
+  }
+}
+
+function humanizeSlug(slug: string): string {
+  return slug
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
 export function getCategoryLabel(
   category: ReportCategory | null | undefined
 ): string {
   if (!category) return "Belum Dikategorikan";
-  return CATEGORY_CONFIG[category]?.label ?? category;
+  return (
+    dynamicCategoryLabels[category] ??
+    CATEGORY_CONFIG[category]?.label ??
+    humanizeSlug(category)
+  );
 }
 
 export function getUrgencyLabel(

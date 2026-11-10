@@ -32,7 +32,7 @@ import {
   useToast,
 } from "@/components/ui";
 import { MapView } from "@/components/map";
-import { ApiError, adminApi } from "@/lib/api";
+import { ApiError, adminApi, categoriesApi } from "@/lib/api";
 import {
   formatDateTime,
   formatTicket,
@@ -42,6 +42,7 @@ import {
   CATEGORY_OPTIONS,
   getCategoryLabel,
   getUrgencyLabel,
+  registerCategoryLabels,
   URGENCY_OPTIONS,
   type ReportCategory,
   type ReportUrgency,
@@ -216,11 +217,35 @@ function AdminVerificationContent() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Pilihan Kategori & Urgensi dari AI / Admin
+  const [categoryOptions, setCategoryOptions] = useState<
+    { value: string; label: string }[]
+  >(CATEGORY_OPTIONS);
   const [selectedCategory, setSelectedCategory] =
     useState<ReportCategory>("jalan_rusak");
   const [selectedUrgency, setSelectedUrgency] =
     useState<ReportUrgency>("tinggi");
   const [reanalyzing, setReanalyzing] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    categoriesApi
+      .listAll()
+      .then((cats) => {
+        if (!isMounted) return;
+        if (Array.isArray(cats) && cats.length > 0) {
+          const opts = cats.map((c) => ({ value: c.value, label: c.label }));
+          setCategoryOptions(opts);
+          registerCategoryLabels(opts);
+        }
+      })
+      .catch((err) => {
+        console.warn("Gagal memuat kategori admin:", err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Modal Foto
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
@@ -241,6 +266,17 @@ function AdminVerificationContent() {
       detail.verification?.category ?? detail.ai.category ?? "jalan_rusak";
     const initialUrg: ReportUrgency =
       detail.verification?.urgency ?? detail.ai.urgency ?? "tinggi";
+
+    setCategoryOptions((prev) => {
+      if (initialCat && !prev.some((o) => o.value === initialCat)) {
+        return [
+          ...prev,
+          { value: initialCat, label: getCategoryLabel(initialCat) },
+        ];
+      }
+      return prev;
+    });
+
     setSelectedCategory(initialCat);
     setSelectedUrgency(initialUrg);
     setAdminNote("");
@@ -762,7 +798,7 @@ function AdminVerificationContent() {
                   }
                   className="h-11 w-full appearance-none rounded-xl border border-stone-200 bg-white pl-3.5 pr-10 text-sm font-medium text-stone-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-600"
                 >
-                  {CATEGORY_OPTIONS.map((opt) => (
+                  {categoryOptions.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>

@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources;
 
-use App\Enums\Category;
 use App\Enums\ReportStatus;
+use App\Models\ReportCategory;
 use App\Enums\Urgency;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -24,9 +24,7 @@ class OfficerReportItemResource extends JsonResource
             ? $this->status
             : ReportStatus::from((string) $this->status);
 
-        $category = $this->category instanceof Category
-            ? $this->category
-            : ($this->category ? Category::tryFrom((string) $this->category) : null);
+        $category = ReportCategory::ref($this->category);
 
         $urgency = $this->urgency instanceof Urgency
             ? $this->urgency

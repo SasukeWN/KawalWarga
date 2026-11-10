@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Enums\Category;
 use App\Enums\EventType;
 use App\Enums\ReportStatus;
 use App\Enums\Urgency;
@@ -54,6 +53,9 @@ class ReportWorkflow
         return DB::transaction(function () use ($data, $photoPath): Report {
             $description   = trim((string) $data['description']);
             $fallbackTitle = mb_substr($description, 0, 60);
+            $chosenCategory = isset($data['category']) && trim((string) $data['category']) !== ''
+                ? trim((string) $data['category'])
+                : null;
 
             $report = Report::create([
                 'title'          => $fallbackTitle,
@@ -65,6 +67,8 @@ class ReportWorkflow
                     ? trim((string) $data['address_text'])
                     : null,
                 'reporter_phone' => self::normalizePhone($data['reporter_phone'] ?? null),
+                'reporter_category' => $chosenCategory,
+                'category'          => $chosenCategory,
                 'status'         => ReportStatus::MENUNGGU_VERIFIKASI,
                 'ai_status'      => 'pending',
             ]);
@@ -92,7 +96,7 @@ class ReportWorkflow
     public function approve(
         Report $report,
         User $admin,
-        Category|string $category,
+        string $category,
         Urgency|string $urgency,
         ?string $note = null
     ): Report {
@@ -107,7 +111,7 @@ class ReportWorkflow
                 throw new ConflictException('Laporan hanya dapat disetujui saat berstatus menunggu verifikasi.');
             }
 
-            $categoryValue = $category instanceof Category ? $category->value : $category;
+            $categoryValue = $category;
             $urgencyValue  = $urgency instanceof Urgency ? $urgency->value : $urgency;
             $now           = now();
 

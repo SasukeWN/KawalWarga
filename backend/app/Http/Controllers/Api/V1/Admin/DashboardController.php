@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1\Admin;
 
-use App\Enums\Category;
 use App\Enums\ReportStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Report;
+use App\Models\ReportCategory;
 use App\Services\Ai\InsightService;
 use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -50,10 +50,7 @@ class DashboardController extends Controller
                 ? $report->status
                 : ReportStatus::from((string) $report->status);
 
-            $rawCategory = $report->category ?? $report->ai_category;
-            $category    = $rawCategory instanceof Category
-                ? $rawCategory
-                : ($rawCategory ? Category::tryFrom((string) $rawCategory) : null);
+            $category = ReportCategory::ref($report->category ?? $report->ai_category);
 
             return [
                 'ticket_id'      => $report->ticket_id,

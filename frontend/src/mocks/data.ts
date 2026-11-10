@@ -8,12 +8,15 @@ import {
 } from "../lib/labels";
 import type {
   Actor,
+  AdminCategory,
   AdminListParams,
   AdminReportDetail,
   AdminReportListItem,
   ApproveReportPayload,
+  CategoryOption,
   ChatbotResponse,
   ChatTicketCard,
+  CreateCategoryPayload,
   CreatedReportResponse,
   CreateReportPayload,
   DashboardAiInsight,
@@ -43,6 +46,7 @@ import type {
   SendChatPayload,
   TimelineItem,
   TrackedReport,
+  UpdateCategoryPayload,
   User,
 } from "../lib/types";
 
@@ -91,6 +95,8 @@ interface InternalMockReport {
   photo_url: string;
   location: ReportLocation;
   reporter_phone: string | null;
+  /** Kategori yang dipilih sendiri oleh pelapor (opsional). */
+  reporter_category?: string | null;
   received_at: string;
   ai: ReportAiAnalysis;
   verification: ReportVerification | null;
@@ -1017,6 +1023,190 @@ const INITIAL_REPORTS: InternalMockReport[] = [
 let reportsStore: InternalMockReport[] = structuredClone(INITIAL_REPORTS);
 let nextTicketNumber = 205;
 
+// ==========================================
+// Kategori dinamis (dikelola admin)
+// ==========================================
+
+interface InternalMockCategory {
+  value: string;
+  label: string;
+  description: string | null;
+  is_active: boolean;
+}
+
+const INITIAL_CATEGORIES: InternalMockCategory[] = [
+  {
+    value: "jalan_rusak",
+    label: "Jalan Rusak",
+    description: "Kerusakan jalan, aspal berlubang, trotoar rusak.",
+    is_active: true,
+  },
+  {
+    value: "sampah",
+    label: "Sampah",
+    description: "Tumpukan sampah liar, sampah menghalangi jalan atau saluran.",
+    is_active: true,
+  },
+  {
+    value: "lampu_mati",
+    label: "Lampu Mati",
+    description: "Lampu penerangan jalan umum atau taman padam/rusak.",
+    is_active: true,
+  },
+];
+
+let categoriesStore: InternalMockCategory[] =
+  structuredClone(INITIAL_CATEGORIES);
+
+function slugifyCategory(label: string): string {
+  const base =
+    label
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .slice(0, 50) || "kategori";
+  let slug = base;
+  let i = 2;
+  while (categoriesStore.some((c) => c.value === slug)) {
+    slug = `${base}_${i++}`;
+  }
+  return slug;
+}
+
+function categoryUsageCount(slug: string): number {
+  return reportsStore.filter(
+    (r) =>
+      r.verification?.category === slug ||
+      r.ai.category === slug ||
+      r.reporter_category === slug
+  ).length;
+}
+
+function toAdminCategory(c: InternalMockCategory): AdminCategory {
+  return {
+    value: c.value,
+    label: c.label,
+    description: c.description,
+    is_active: c.is_active,
+    reports_count: categoryUsageCount(c.value),
+  };
+}
+
+export async function mockListPublicCategories(): Promise<CategoryOption[]> {
+  await mockDelay(250);
+  return categoriesStore
+    .filter((c) => c.is_active)
+    .map((c) => ({
+      value: c.value,
+      label: c.label,
+      description: c.description,
+    }));
+}
+
+export async function mockAdminListCategories(): Promise<AdminCategory[]> {
+  await mockDelay(300);
+  return categoriesStore.map(toAdminCategory);
+}
+
+export async function mockAdminCreateCategory(
+  payload: CreateCategoryPayload
+): Promise<AdminCategory> {
+  await mockDelay(350);
+
+  const label = payload.label?.trim() ?? "";
+  if (label.length < 3) {
+    throw new ApiError(422, "Data yang dikirim tidak valid.", {
+      label: ["Nama kategori minimal 3 karakter."],
+    });
+  }
+  if (categoriesStore.some((c) => c.label.toLowerCase() === label.toLowerCase())) {
+    throw new ApiError(409, "Kategori dengan nama tersebut sudah ada.");
+  }
+
+  const created: InternalMockCategory = {
+    value: slugifyCategory(label),
+    label,
+    description: payload.description?.trim() || null,
+    is_active: true,
+  };
+  categoriesStore = [...categoriesStore, created];
+  return toAdminCategory(created);
+}
+
+export async function mockAdminUpdateCategory(
+  slug: string,
+  payload: UpdateCategoryPayload
+): Promise<AdminCategory> {
+  await mockDelay(300);
+
+  const target = categoriesStore.find((c) => c.value === slug);
+  if (!target) {
+    throw new ApiError(404, "Data tidak ditemukan.");
+  }
+
+  if (payload.label !== undefined) {
+    const label = payload.label.trim();
+    if (label.length < 3) {
+      throw new ApiError(422, "Data yang dikirim tidak valid.", {
+        label: ["Nama kategori minimal 3 karakter."],
+      });
+    }
+    if (
+      categoriesStore.some(
+        (c) => c.value !== slug && c.label.toLowerCase() === label.toLowerCase()
+      )
+    ) {
+      throw new ApiError(409, "Kategori dengan nama tersebut sudah ada.");
+    }
+    target.label = label;
+  }
+
+  if (payload.description !== undefined) {
+    target.description = payload.description?.trim() || null;
+  }
+
+  if (payload.is_active !== undefined) {
+    if (
+      payload.is_active === false &&
+      target.is_active &&
+      categoriesStore.filter((c) => c.is_active && c.value !== slug).length === 0
+    ) {
+      throw new ApiError(409, "Minimal harus ada satu kategori aktif.");
+    }
+    target.is_active = payload.is_active;
+  }
+
+  return toAdminCategory(target);
+}
+
+export async function mockAdminDeleteCategory(slug: string): Promise<null> {
+  await mockDelay(300);
+
+  const target = categoriesStore.find((c) => c.value === slug);
+  if (!target) {
+    throw new ApiError(404, "Data tidak ditemukan.");
+  }
+
+  const used = categoryUsageCount(slug);
+  if (used > 0) {
+    throw new ApiError(
+      409,
+      `Kategori sudah dipakai ${used} laporan sehingga tidak dapat dihapus. Nonaktifkan saja agar tidak muncul di formulir warga.`
+    );
+  }
+  if (
+    target.is_active &&
+    categoriesStore.filter((c) => c.is_active && c.value !== slug).length === 0
+  ) {
+    throw new ApiError(409, "Minimal harus ada satu kategori aktif.");
+  }
+
+  categoriesStore = categoriesStore.filter((c) => c.value !== slug);
+  return null;
+}
+
 function nowWibIso(): string {
   const now = new Date();
   const wibOffsetMs = 7 * 60 * 60 * 1000;
@@ -1027,7 +1217,12 @@ function nowWibIso(): string {
 function getEffectiveCategory(
   report: InternalMockReport
 ): ReportCategory | null {
-  return report.verification?.category ?? report.ai.category ?? null;
+  return (
+    report.verification?.category ??
+    report.reporter_category ??
+    report.ai.category ??
+    null
+  );
 }
 
 function getEffectiveUrgency(report: InternalMockReport): ReportUrgency | null {

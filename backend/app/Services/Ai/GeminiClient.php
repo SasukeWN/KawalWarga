@@ -27,8 +27,12 @@ class GeminiClient
         $model   = (string) config('services.gemini.model');
         $timeout = (int) config('services.gemini.timeout', 12);
 
-        if ($apiKey === '' || $model === '') {
-            throw new AiUnavailable('Konfigurasi Gemini belum diatur.');
+        if ($apiKey === '') {
+            throw new AiUnavailable('GEMINI_API_KEY belum diisi di backend/.env');
+        }
+
+        if ($model === '') {
+            throw new AiUnavailable('GEMINI_MODEL belum diisi di backend/.env (contoh: gemini-2.5-flash)');
         }
 
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
@@ -74,7 +78,8 @@ class GeminiClient
         }
 
         if (! $response->successful()) {
-            throw new AiUnavailable('Gemini merespons dengan status HTTP '.$response->status().'.');
+            $errMessage = $response->json('error.message') ?? $response->body();
+            throw new AiUnavailable('Gemini merespons dengan status HTTP '.$response->status().': '.$errMessage);
         }
 
         $text = data_get($response->json(), 'candidates.0.content.parts.0.text');

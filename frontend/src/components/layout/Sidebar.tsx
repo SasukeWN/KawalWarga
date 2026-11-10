@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   ClipboardCheck,
   Files,
+  Tags,
   ListChecks,
   Briefcase,
   MapPin,
@@ -59,6 +60,11 @@ export const STAFF_MENU_ITEMS: Record<StaffRole, NavMenuItem[]> = {
       href: "/admin/riwayat",
       label: "Riwayat Laporan",
       icon: Files,
+    },
+    {
+      href: "/admin/kategori",
+      label: "Kelola Kategori",
+      icon: Tags,
     },
   ],
   petugas: [

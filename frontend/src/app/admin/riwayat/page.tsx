@@ -21,13 +21,14 @@ import {
   StatusChip,
   UrgencyChip,
 } from "@/components/ui";
-import { ApiError, adminApi } from "@/lib/api";
+import { ApiError, adminApi, categoriesApi } from "@/lib/api";
 import { formatDate, formatTicket } from "@/lib/format";
 import {
   CATEGORY_OPTIONS,
   getCategoryLabel,
   getStatusLabel,
   getUrgencyLabel,
+  registerCategoryLabels,
   STATUS_OPTIONS,
   URGENCY_OPTIONS,
   type ReportCategory,
@@ -51,7 +52,31 @@ export default function AdminHistoryPage() {
   const [statusFilter, setStatusFilter] = useState<ReportStatus | "">("");
   const [categoryFilter, setCategoryFilter] = useState<ReportCategory | "">("");
   const [urgencyFilter, setUrgencyFilter] = useState<ReportUrgency | "">("");
+  const [categoryOptions, setCategoryOptions] = useState<
+    { value: string; label: string }[]
+  >(CATEGORY_OPTIONS);
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    let isMounted = true;
+    categoriesApi
+      .listAll()
+      .then((cats) => {
+        if (!isMounted) return;
+        if (Array.isArray(cats) && cats.length > 0) {
+          const opts = cats.map((c) => ({ value: c.value, label: c.label }));
+          setCategoryOptions(opts);
+          registerCategoryLabels(opts);
+        }
+      })
+      .catch((err) => {
+        console.warn("Gagal memuat kategori admin:", err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Data states
   const [items, setItems] = useState<AdminReportListItem[]>([]);
@@ -258,7 +283,7 @@ export default function AdminHistoryPage() {
                 className="h-11 w-full appearance-none rounded-xl border border-stone-200 bg-white pl-3.5 pr-9 text-xs sm:text-sm text-stone-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600"
               >
                 <option value="">Semua kategori</option>
-                {CATEGORY_OPTIONS.map((opt) => (
+                {categoryOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>

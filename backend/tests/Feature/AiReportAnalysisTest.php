@@ -107,9 +107,9 @@ class AiReportAnalysisTest extends TestCase
 
         $this->assertSame('done', $report->ai_status);
         $this->assertSame('Jalan berlubang di Jl. Melati', $report->title);
-        $this->assertSame(Category::JALAN_RUSAK, $report->ai_category);
+        $this->assertSame('jalan_rusak', $report->ai_category);
         $this->assertSame(Urgency::TINGGI, $report->ai_urgency);
-        $this->assertSame(Category::JALAN_RUSAK, $report->category);
+        $this->assertSame('jalan_rusak', $report->category);
         $this->assertSame(Urgency::TINGGI, $report->urgency);
         $this->assertSame(
             'Lubang jalan di kawasan permukiman berisiko bagi pengendara saat hujan.',

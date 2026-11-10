@@ -2,9 +2,9 @@
 
 namespace App\Http\Resources;
 
-use App\Enums\Category;
 use App\Enums\EventType;
 use App\Enums\ReportStatus;
+use App\Models\ReportCategory;
 use App\Models\ReportEvent;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -24,7 +24,7 @@ class TrackResource extends JsonResource
 
         $rawCategory  = $this->category ?? $this->ai_category;
         $categoryEnum = (! $isUnverified && $rawCategory)
-            ? ($rawCategory instanceof Category ? $rawCategory : Category::tryFrom((string) $rawCategory))
+            ? ReportCategory::ref($rawCategory)
             : null;
 
         /** @var \Illuminate\Support\Collection<int, ReportEvent> $events */

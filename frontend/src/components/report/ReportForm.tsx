@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Send, ShieldCheck, Loader2 } from "lucide-react";
+import { Send, ShieldCheck, Loader2, Sparkles, Tag } from "lucide-react";
 import { clsx } from "clsx";
 import { Card, useToast } from "@/components/ui";
 import { APP_CONFIG } from "@/lib/config";
-import { ApiError, reportsApi } from "@/lib/api";
+import { ApiError, reportsApi, categoriesApi } from "@/lib/api";
+import { registerCategoryLabels, CATEGORY_OPTIONS } from "@/lib/labels";
+import type { CategoryOption } from "@/lib/types";
 import { PhotoPicker } from "./PhotoPicker";
 import { LocationPicker, type LocationValue } from "./LocationPicker";
 
@@ -15,6 +17,7 @@ export const LAST_TICKET_META_STORAGE_KEY = "kw_last_ticket_meta";
 
 interface FormFieldErrors {
   description?: string;
+  category?: string;
   photo?: string;
   location?: string;
   reporter_phone?: string;
@@ -27,6 +30,14 @@ export function ReportForm() {
   const { error: showToastError } = useToast();
 
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState<string>("");
+  const [categories, setCategories] = useState<CategoryOption[]>(() =>
+    CATEGORY_OPTIONS.map((c) => ({
+      value: c.value,
+      label: c.label,
+      description: null,
+    }))
+  );
   const [photo, setPhoto] = useState<File | null>(null);
   const [location, setLocation] = useState<LocationValue>({
     latitude: APP_CONFIG.defaultMapCenter.lat,
@@ -36,6 +47,26 @@ export function ReportForm() {
   const [reporterPhone, setReporterPhone] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FormFieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    categoriesApi
+      .listPublic()
+      .then((data) => {
+        if (!isMounted) return;
+        if (Array.isArray(data) && data.length > 0) {
+          setCategories(data);
+          registerCategoryLabels(data);
+        }
+      })
+      .catch((err) => {
+        console.warn("Gagal memuat kategori dari server:", err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   function validateForm(): boolean {
     const errors: FormFieldErrors = {};
@@ -90,6 +121,7 @@ export function ReportForm() {
     try {
       const created = await reportsApi.createReport({
         description: description.trim(),
+        category: category.trim() || undefined,
         latitude: location.latitude,
         longitude: location.longitude,
         address_text: location.address_text?.trim() || undefined,
@@ -114,6 +146,9 @@ export function ReportForm() {
           const apiErrors: FormFieldErrors = {};
           if (err.errors.description?.[0]) {
             apiErrors.description = err.errors.description[0];
+          }
+          if (err.errors.category?.[0]) {
+            apiErrors.category = err.errors.category[0];
           }
           if (err.errors.photo?.[0]) {
             apiErrors.photo = err.errors.photo[0];
@@ -150,7 +185,102 @@ export function ReportForm() {
           </p>
         </div>
 
-        {/* 1. Deskripsi */}
+        {/* 1. Kategori Permasalahan (Admin-defined & AI Auto) */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="block text-xs sm:text-sm font-bold text-stone-900">
+              Kategori permasalahan{" "}
+              <span className="font-normal text-stone-500">(opsional)</span>
+            </label>
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800">
+              <Sparkles className="h-3 w-3 text-emerald-700" />
+              Didukung AI
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                setCategory("");
+                if (fieldErrors.category) {
+                  setFieldErrors((prev) => ({ ...prev, category: undefined }));
+                }
+              }}
+              className={clsx(
+                "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all border",
+                category === ""
+                  ? "border-emerald-700 bg-emerald-50 text-emerald-900 shadow-xs ring-2 ring-emerald-700/20"
+                  : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:bg-stone-50"
+              )}
+            >
+              <Sparkles
+                className={clsx(
+                  "h-3.5 w-3.5",
+                  category === "" ? "text-emerald-700" : "text-stone-400"
+                )}
+              />
+              <span>Otomatis (Analisis AI)</span>
+            </button>
+
+            {categories.map((cat) => {
+              const isSelected = category === cat.value;
+              return (
+                <button
+                  key={cat.value}
+                  type="button"
+                  onClick={() => {
+                    setCategory(isSelected ? "" : cat.value);
+                    if (fieldErrors.category) {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        category: undefined,
+                      }));
+                    }
+                  }}
+                  className={clsx(
+                    "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all border",
+                    isSelected
+                      ? "border-emerald-700 bg-emerald-700 text-white shadow-xs ring-2 ring-emerald-700/30"
+                      : "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50"
+                  )}
+                  title={cat.description || cat.label}
+                >
+                  <Tag
+                    className={clsx(
+                      "h-3 w-3",
+                      isSelected ? "text-white/80" : "text-stone-400"
+                    )}
+                  />
+                  <span>{cat.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {fieldErrors.category ? (
+            <p className="text-xs font-medium text-rose-600" role="alert">
+              {fieldErrors.category}
+            </p>
+          ) : (
+            <p className="text-xs text-stone-500">
+              {category ? (
+                <>
+                  Kategori dipilih:{" "}
+                  <strong className="text-stone-800">
+                    {categories.find((c) => c.value === category)?.label ||
+                      category}
+                  </strong>
+                  . Admin dan AI akan memvalidasi saat proses verifikasi.
+                </>
+              ) : (
+                "Pilih kategori di atas bila Anda sudah tahu, atau biarkan AI mengenali jenis permasalahan secara otomatis dari foto & deskripsi."
+              )}
+            </p>
+          )}
+        </div>
+
+        {/* 2. Deskripsi */}
         <div className="space-y-2">
           <label
             htmlFor="report-description"
@@ -184,7 +314,7 @@ export function ReportForm() {
           )}
         </div>
 
-        {/* 2. Foto Bukti */}
+        {/* 3. Foto Bukti */}
         <div className="space-y-2">
           <label className="block text-xs sm:text-sm font-bold text-stone-900">
             Foto bukti kejadian <span className="text-stone-900">*</span>
@@ -204,7 +334,7 @@ export function ReportForm() {
           />
         </div>
 
-        {/* 3. Lokasi Kejadian */}
+        {/* 4. Lokasi Kejadian */}
         <div className="space-y-2">
           <label className="block text-xs sm:text-sm font-bold text-stone-900">
             Lokasi kejadian <span className="text-stone-900">*</span>
@@ -221,7 +351,7 @@ export function ReportForm() {
           />
         </div>
 
-        {/* 4. Nomor WhatsApp */}
+        {/* 5. Nomor WhatsApp */}
         <div className="space-y-2">
           <label
             htmlFor="report-whatsapp"

@@ -18,6 +18,8 @@ return [
         'api_key' => env('GEMINI_API_KEY'),
         'model'   => env('GEMINI_MODEL'),
         'timeout' => env('AI_TIMEOUT', 12),
+        // Tampilkan detail error Gemini di balasan chatbot (hanya untuk debugging lokal).
+        'debug'   => (bool) env('GEMINI_DEBUG', false),
     ],
 
     'health_key' => env('HEALTH_KEY'),

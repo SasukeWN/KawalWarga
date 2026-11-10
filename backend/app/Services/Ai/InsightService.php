@@ -2,10 +2,10 @@
 
 namespace App\Services\Ai;
 
-use App\Enums\Category;
 use App\Enums\ReportStatus;
 use App\Models\AiInsight;
 use App\Models\Report;
+use App\Models\ReportCategory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -55,13 +55,29 @@ class InsightService
             ->groupBy('effective_category')
             ->pluck('aggregate', 'effective_category');
 
+        // Semua kategori aktif selalu tampil; kategori nonaktif/terhapus hanya tampil bila ada laporannya.
         $byCategory = [];
-        foreach (Category::cases() as $cat) {
+        $seen       = [];
+        foreach (ReportCategory::query()->orderBy('sort_order')->orderBy('id')->get() as $cat) {
+            $count = (int) ($categoryRows[$cat->slug] ?? 0);
+            $seen[$cat->slug] = true;
+            if (! $cat->is_active && $count === 0) {
+                continue;
+            }
             $byCategory[] = [
-                'category' => $cat->value,
-                'label'    => $cat->label(),
-                'count'    => (int) ($categoryRows[$cat->value] ?? 0),
+                'category' => $cat->slug,
+                'label'    => $cat->label,
+                'count'    => $count,
             ];
+        }
+        foreach ($categoryRows as $slug => $count) {
+            if (! isset($seen[$slug])) {
+                $byCategory[] = [
+                    'category' => (string) $slug,
+                    'label'    => ReportCategory::labelFor($slug) ?? (string) $slug,
+                    'count'    => (int) $count,
+                ];
+            }
         }
 
         return [

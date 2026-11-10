@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreReportRequest extends FormRequest
 {
@@ -22,6 +23,12 @@ class StoreReportRequest extends FormRequest
             'latitude'       => ['required', 'numeric', 'between:-90,90'],
             'longitude'      => ['required', 'numeric', 'between:-180,180'],
             'address_text'   => ['nullable', 'string', 'max:255'],
+            // Kategori pilihan pelapor (opsional); hanya kategori aktif yang dikelola admin.
+            'category'       => [
+                'nullable',
+                'string',
+                Rule::exists('categories', 'slug')->where('is_active', true),
+            ],
             'photo'          => ['required', 'file', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
             'reporter_phone' => [
                 'nullable',
@@ -64,6 +71,7 @@ class StoreReportRequest extends FormRequest
             'longitude.numeric'    => 'Format longitude tidak valid.',
             'longitude.between'    => 'Nilai longitude harus berada di antara -180 dan 180.',
             'address_text.max'     => 'Teks alamat maksimal 255 karakter.',
+            'category.exists'      => 'Kategori yang dipilih tidak tersedia.',
             'photo.required'       => 'Foto bukti laporan wajib diunggah.',
             'photo.file'           => 'Foto bukti harus berupa file.',
             'photo.image'          => 'File yang diunggah harus berupa gambar.',

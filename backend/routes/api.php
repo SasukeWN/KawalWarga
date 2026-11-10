@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\V1\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Api\V1\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\Officer\ReportController as OfficerReportController;
+use App\Http\Controllers\Api\V1\Public\CategoryController as PublicCategoryController;
 use App\Http\Controllers\Api\V1\Public\ChatbotController;
 use App\Http\Controllers\Api\V1\Public\ReportController as PublicReportController;
 use App\Support\ApiResponse;
@@ -15,6 +17,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/health/ai', [HealthController::class, 'ai']);
 
     // Endpoint Publik (Warga)
+    Route::get('/categories', [PublicCategoryController::class, 'index']);
     Route::post('/reports', [PublicReportController::class, 'store'])->middleware('throttle:reports');
     Route::get('/reports/track/{ticket_id}', [PublicReportController::class, 'track']);
     Route::post('/chatbot', [ChatbotController::class, 'send'])->middleware('throttle:chatbot');
@@ -36,6 +39,11 @@ Route::prefix('v1')->group(function () {
         Route::post('/reports/{ticket_id}/approve', [AdminReportController::class, 'approve']);
         Route::post('/reports/{ticket_id}/reject', [AdminReportController::class, 'reject']);
         Route::post('/reports/{ticket_id}/reanalyze', [AdminReportController::class, 'reanalyze']);
+
+        Route::get('/categories', [AdminCategoryController::class, 'index']);
+        Route::post('/categories', [AdminCategoryController::class, 'store']);
+        Route::put('/categories/{slug}', [AdminCategoryController::class, 'update']);
+        Route::delete('/categories/{slug}', [AdminCategoryController::class, 'destroy']);
 
         Route::get('/dashboard/summary', [AdminDashboardController::class, 'summary']);
         Route::get('/dashboard/map', [AdminDashboardController::class, 'map']);

@@ -21,6 +21,9 @@ export async function createReport(
   if (payload.address_text) {
     formData.append("address_text", payload.address_text);
   }
+  if (payload.category) {
+    formData.append("category", payload.category);
+  }
   formData.append("photo", payload.photo);
   if (payload.reporter_phone) {
     formData.append("reporter_phone", payload.reporter_phone);

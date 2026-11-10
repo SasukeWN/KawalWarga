@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1\Officer;
 
-use App\Enums\Category;
 use App\Enums\ReportStatus;
 use App\Enums\Urgency;
 use App\Exceptions\ConflictException;
@@ -31,7 +30,7 @@ class ReportController extends Controller
     {
         $request->validate([
             'sort'     => ['nullable', 'string', 'in:urgency,newest'],
-            'category' => ['nullable', 'string', Rule::enum(Category::class)],
+            'category' => ['nullable', 'string', Rule::exists('categories', 'slug')],
             'page'     => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ]);

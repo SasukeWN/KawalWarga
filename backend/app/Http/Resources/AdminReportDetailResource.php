@@ -2,10 +2,10 @@
 
 namespace App\Http\Resources;
 
-use App\Enums\Category;
 use App\Enums\EventType;
 use App\Enums\ReportStatus;
 use App\Enums\Urgency;
+use App\Models\ReportCategory;
 use App\Models\ReportDuplicate;
 use App\Models\ReportEvent;
 use Illuminate\Http\Request;
@@ -22,19 +22,14 @@ class AdminReportDetailResource extends JsonResource
             ? $this->status
             : ReportStatus::from((string) $this->status);
 
-        $rawCategory = $this->category ?? $this->ai_category;
-        $category    = $rawCategory instanceof Category
-            ? $rawCategory
-            : ($rawCategory ? Category::tryFrom((string) $rawCategory) : null);
+        $category = ReportCategory::ref($this->category ?? $this->ai_category);
 
         $rawUrgency = $this->urgency ?? $this->ai_urgency;
         $urgency    = $rawUrgency instanceof Urgency
             ? $rawUrgency
             : ($rawUrgency ? Urgency::tryFrom((string) $rawUrgency) : null);
 
-        $aiCategory = $this->ai_category instanceof Category
-            ? $this->ai_category
-            : ($this->ai_category ? Category::tryFrom((string) $this->ai_category) : null);
+        $aiCategory = ReportCategory::ref($this->ai_category);
 
         $aiUrgency = $this->ai_urgency instanceof Urgency
             ? $this->ai_urgency

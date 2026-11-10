@@ -103,7 +103,7 @@ class SchemaAndSeederTest extends TestCase
         $this->assertSame('ADU-001', $fresh->ticket_id);
         $this->assertSame(ReportStatus::MENUNGGU_PENANGANAN, $fresh->status);
         $this->assertSame('Menunggu Penanganan', $fresh->status_label);
-        $this->assertSame(Category::JALAN_RUSAK, $fresh->category);
+        $this->assertSame('jalan_rusak', $fresh->category);
         $this->assertSame('Jalan Rusak', $fresh->category_label);
         $this->assertSame(Urgency::DARURAT, $fresh->urgency);
         $this->assertSame('Darurat', $fresh->urgency_label);

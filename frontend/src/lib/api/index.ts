@@ -14,3 +14,4 @@ export * as authApi from "./auth";
 export * as adminApi from "./admin";
 export * as officerApi from "./officer";
 export * as chatbotApi from "./chatbot";
+export * as categoriesApi from "./categories";

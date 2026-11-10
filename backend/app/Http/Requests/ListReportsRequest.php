@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\Category;
 use App\Enums\ReportStatus;
 use App\Enums\Urgency;
 use Illuminate\Foundation\Http\FormRequest;
@@ -23,7 +22,7 @@ class ListReportsRequest extends FormRequest
         return [
             'search'   => ['nullable', 'string', 'max:50'],
             'status'   => ['nullable', 'string', Rule::enum(ReportStatus::class)],
-            'category' => ['nullable', 'string', Rule::enum(Category::class)],
+            'category' => ['nullable', 'string', Rule::exists('categories', 'slug')],
             'urgency'  => ['nullable', 'string', Rule::enum(Urgency::class)],
             'sort'     => ['nullable', 'string', 'in:newest,oldest,urgency'],
             'from'     => ['nullable', 'date_format:Y-m-d'],
@@ -40,7 +39,7 @@ class ListReportsRequest extends FormRequest
     {
         return [
             'status.Illuminate\Validation\Rules\Enum'   => 'Filter status tidak valid.',
-            'category.Illuminate\Validation\Rules\Enum' => 'Filter kategori tidak valid.',
+            'category.exists'                           => 'Filter kategori tidak valid.',
             'urgency.Illuminate\Validation\Rules\Enum'  => 'Filter urgensi tidak valid.',
             'sort.in'                                   => 'Pilihan urutan tidak valid.',
             'from.date_format'                          => 'Format tanggal awal harus YYYY-MM-DD.',
