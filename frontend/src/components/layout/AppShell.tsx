@@ -67,7 +67,7 @@ export function AppShell({
       {/* Drawer Sidebar Mobile */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-50 flex lg:hidden"
+          className="fixed inset-0 z-[1000] flex lg:hidden"
           role="dialog"
           aria-modal="true"
           aria-label="Menu navigasi"
@@ -77,7 +77,7 @@ export function AppShell({
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
-          <div className="relative z-10 flex h-full w-[260px] flex-col bg-stone-50 shadow-xl">
+          <div className="relative z-10 flex h-full w-[260px] flex-col bg-stone-50 shadow-xl overflow-y-auto">
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
@@ -92,7 +92,7 @@ export function AppShell({
               activePath={activePath}
               onNavigate={() => setMobileMenuOpen(false)}
               onLogout={handleDefaultLogout}
-              className="h-full border-r-0"
+              className="min-h-full border-r-0"
             />
           </div>
         </div>
