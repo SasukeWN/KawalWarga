@@ -1055,8 +1055,37 @@ const INITIAL_CATEGORIES: InternalMockCategory[] = [
   },
 ];
 
-let categoriesStore: InternalMockCategory[] =
-  structuredClone(INITIAL_CATEGORIES);
+const MOCK_CATEGORIES_KEY = "kw_mock_categories";
+
+function loadInitialCategories(): InternalMockCategory[] {
+  if (typeof window !== "undefined") {
+    try {
+      const saved = window.localStorage.getItem(MOCK_CATEGORIES_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return structuredClone(INITIAL_CATEGORIES);
+}
+
+let categoriesStore: InternalMockCategory[] = loadInitialCategories();
+
+function persistCategoriesStore(next: InternalMockCategory[]): void {
+  categoriesStore = next;
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem(MOCK_CATEGORIES_KEY, JSON.stringify(next));
+    } catch {
+      // ignore
+    }
+  }
+}
 
 function slugifyCategory(label: string): string {
   const base =
@@ -1094,15 +1123,18 @@ function toAdminCategory(c: InternalMockCategory): AdminCategory {
   };
 }
 
-export async function mockListPublicCategories(): Promise<CategoryOption[]> {
+export async function mockListPublicCategories(options?: {
+  all?: boolean;
+}): Promise<CategoryOption[]> {
   await mockDelay(250);
-  return categoriesStore
-    .filter((c) => c.is_active)
-    .map((c) => ({
-      value: c.value,
-      label: c.label,
-      description: c.description,
-    }));
+  const items = options?.all
+    ? categoriesStore
+    : categoriesStore.filter((c) => c.is_active);
+  return items.map((c) => ({
+    value: c.value,
+    label: c.label,
+    description: c.description,
+  }));
 }
 
 export async function mockAdminListCategories(): Promise<AdminCategory[]> {
@@ -1131,7 +1163,8 @@ export async function mockAdminCreateCategory(
     description: payload.description?.trim() || null,
     is_active: true,
   };
-  categoriesStore = [...categoriesStore, created];
+  const updated = [...categoriesStore, created];
+  persistCategoriesStore(updated);
   return toAdminCategory(created);
 }
 
@@ -1178,6 +1211,7 @@ export async function mockAdminUpdateCategory(
     target.is_active = payload.is_active;
   }
 
+  persistCategoriesStore([...categoriesStore]);
   return toAdminCategory(target);
 }
 
@@ -1203,7 +1237,8 @@ export async function mockAdminDeleteCategory(slug: string): Promise<null> {
     throw new ApiError(409, "Minimal harus ada satu kategori aktif.");
   }
 
-  categoriesStore = categoriesStore.filter((c) => c.value !== slug);
+  const next = categoriesStore.filter((c) => c.value !== slug);
+  persistCategoriesStore(next);
   return null;
 }
 

@@ -57,11 +57,26 @@ export default function OfficerQueuePage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Load dynamic categories
+  const refreshCategories = useCallback(() => {
+    categoriesApi
+      .listPublic({ all: true })
+      .then((cats) => {
+        if (Array.isArray(cats) && cats.length > 0) {
+          const opts = cats.map((c) => ({ value: c.value, label: c.label }));
+          setCategoryOptions(opts);
+          registerCategoryLabels(opts);
+        }
+      })
+      .catch((err) => {
+        console.warn("Gagal memuat kategori petugas:", err);
+      });
+  }, []);
+
+  // Load dynamic categories on mount & on window focus
   useEffect(() => {
     let isMounted = true;
     categoriesApi
-      .listAll()
+      .listPublic({ all: true })
       .then((cats) => {
         if (!isMounted) return;
         if (Array.isArray(cats) && cats.length > 0) {
@@ -74,8 +89,24 @@ export default function OfficerQueuePage() {
         console.warn("Gagal memuat kategori petugas:", err);
       });
 
+    const handleFocus = () => {
+      categoriesApi
+        .listPublic({ all: true })
+        .then((cats) => {
+          if (!isMounted) return;
+          if (Array.isArray(cats) && cats.length > 0) {
+            const opts = cats.map((c) => ({ value: c.value, label: c.label }));
+            setCategoryOptions(opts);
+            registerCategoryLabels(opts);
+          }
+        })
+        .catch(() => {});
+    };
+
+    window.addEventListener("focus", handleFocus);
     return () => {
       isMounted = false;
+      window.removeEventListener("focus", handleFocus);
     };
   }, []);
 
@@ -258,6 +289,7 @@ export default function OfficerQueuePage() {
             <div className="relative">
               <select
                 id="queue-filter-category"
+                onFocus={refreshCategories}
                 value={categoryFilter}
                 onChange={(e) =>
                   setCategoryFilter(e.target.value as ReportCategory | "")

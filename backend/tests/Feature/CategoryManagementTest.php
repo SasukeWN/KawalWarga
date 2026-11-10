@@ -61,6 +61,18 @@ class CategoryManagementTest extends TestCase
         $values = collect($res->json('data'))->pluck('value')->all();
         $this->assertSame(['jalan_rusak', 'lampu_mati'], $values);
         $this->assertSame('Jalan Rusak', $res->json('data.0.label'));
+
+        // Dengan ?all=1, kategori nonaktif tetap dikembalikan (berguna untuk filter petugas)
+        $allRes = $this->getJson('/api/v1/categories?all=1');
+        $allRes->assertOk();
+        $allValues = collect($allRes->json('data'))->pluck('value')->all();
+        $this->assertSame(['jalan_rusak', 'sampah', 'lampu_mati'], $allValues);
+
+        // Petugas dengan token auth dapat mengakses /api/v1/categories tanpa 403
+        $officerRes = $this->getJson('/api/v1/categories?all=1', [
+            'Authorization' => 'Bearer '.$this->officerToken,
+        ]);
+        $officerRes->assertOk()->assertJsonPath('success', true);
     }
 
     public function test_admin_can_create_category_with_generated_slug(): void

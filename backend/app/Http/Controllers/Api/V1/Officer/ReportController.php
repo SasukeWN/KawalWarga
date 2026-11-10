@@ -51,7 +51,7 @@ class ReportController extends Controller
         }
 
         if ($request->filled('category')) {
-            $query->where('category', $request->input('category'));
+            $query->whereRaw('COALESCE(category, ai_category) = ?', [(string) $request->input('category')]);
         }
 
         if ($request->filled('urgency')) {
@@ -119,7 +119,7 @@ class ReportController extends Controller
         }
 
         if ($request->filled('category')) {
-            $query->where('category', $request->input('category'));
+            $query->whereRaw('COALESCE(category, ai_category) = ?', [(string) $request->input('category')]);
         }
 
         if ($request->filled('urgency')) {

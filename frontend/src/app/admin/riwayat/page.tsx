@@ -57,6 +57,21 @@ export default function AdminHistoryPage() {
   >(CATEGORY_OPTIONS);
   const [page, setPage] = useState(1);
 
+  const refreshCategories = useCallback(() => {
+    categoriesApi
+      .listAll()
+      .then((cats) => {
+        if (Array.isArray(cats) && cats.length > 0) {
+          const opts = cats.map((c) => ({ value: c.value, label: c.label }));
+          setCategoryOptions(opts);
+          registerCategoryLabels(opts);
+        }
+      })
+      .catch((err) => {
+        console.warn("Gagal memuat kategori admin:", err);
+      });
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
     categoriesApi
@@ -73,8 +88,24 @@ export default function AdminHistoryPage() {
         console.warn("Gagal memuat kategori admin:", err);
       });
 
+    const handleFocus = () => {
+      categoriesApi
+        .listAll()
+        .then((cats) => {
+          if (!isMounted) return;
+          if (Array.isArray(cats) && cats.length > 0) {
+            const opts = cats.map((c) => ({ value: c.value, label: c.label }));
+            setCategoryOptions(opts);
+            registerCategoryLabels(opts);
+          }
+        })
+        .catch(() => {});
+    };
+
+    window.addEventListener("focus", handleFocus);
     return () => {
       isMounted = false;
+      window.removeEventListener("focus", handleFocus);
     };
   }, []);
 
@@ -275,6 +306,7 @@ export default function AdminHistoryPage() {
             <div className="relative">
               <select
                 id="history-filter-category"
+                onFocus={refreshCategories}
                 value={categoryFilter}
                 onChange={(e) => {
                   setCategoryFilter(e.target.value as ReportCategory | "");

@@ -13,14 +13,17 @@ import type {
 } from "../types";
 import { apiRequest, isMockEnabled } from "./client";
 
-/** Kategori aktif untuk formulir warga (publik, tanpa login). */
-export async function listPublic(): Promise<CategoryOption[]> {
+/** Kategori aktif untuk formulir warga (publik, tanpa login), atau semua kategori dengan ?all=1. */
+export async function listPublic(options?: {
+  all?: boolean;
+}): Promise<CategoryOption[]> {
   if (isMockEnabled()) {
-    return mockListPublicCategories();
+    return mockListPublicCategories(options);
   }
 
   return apiRequest<CategoryOption[]>("/categories", {
     method: "GET",
+    query: options?.all ? { all: 1 } : undefined,
     skipAuthRedirect: true,
   });
 }
