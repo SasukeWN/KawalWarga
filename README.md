@@ -364,8 +364,13 @@ Gunakan daftar periksa berikut untuk memverifikasi kesiapan sistem secara menyel
 
 ---
 
-## 👥 Tim & Pengembang
+## 👥 Tim Penyusun & Pengembang
 
-Dikembangkan dengan penuh dedikasi untuk Kompetisi Hackathon **KawalWarga** 2026.
-- **Frontend Lead**: KawalWarga Frontend Team (Next.js, Tailwind CSS, Leaflet, Design System)
-- **Backend & AI Lead**: KawalWarga API Team (Laravel, SQLite WAL, Gemini AI Prompt Engineering)
+Dikembangkan dengan penuh dedikasi untuk Kompetisi Hackathon **KawalWarga** 2026 oleh Mahasiswa Program Studi Teknik Informatika — **Universitas Pamulang**:
+
+| Peran | Anggota Tim | Tautan & Portofolio |
+| :--- | :--- | :--- |
+| **Backend & AI Lead** | **Ilyasa Ramadhany Ekaputra Ismail** | • GitHub: [github.com/yasaramdh07](https://github.com/yasaramdh07)<br>• Portofolio: [ilyasaramadhany.my.id](https://ilyasaramadhany.my.id/) |
+| **Frontend Lead** | **Dandy Ghaisan Vidyanto** | • GitHub: [github.com/SasukeWN](https://github.com/SasukeWN)<br>• Portofolio: [dandy-portofolio-blond.vercel.app](https://dandy-portofolio-blond.vercel.app/) |
+
+*Mahasiswa Program Studi Teknik Informatika — Universitas Pamulang*
