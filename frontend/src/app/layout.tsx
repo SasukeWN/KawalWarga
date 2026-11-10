@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { APP_CONFIG } from "@/lib/config";
 import { AuthProvider } from "@/lib/auth";
 import { ToastProvider } from "@/components/ui/Toast";
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
 const inter = Inter({

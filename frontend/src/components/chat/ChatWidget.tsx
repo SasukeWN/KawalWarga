@@ -49,7 +49,7 @@ export function ChatWidget({ defaultOpen = false }: ChatWidgetProps) {
   const [inputValue, setInputValue] = useState("");
   const [sending, setSending] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -70,8 +70,11 @@ export function ChatWidget({ defaultOpen = false }: ChatWidgetProps) {
   }, []);
 
   useEffect(() => {
-    if (!isOpen) return;
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!isOpen || !messagesContainerRef.current) return;
+    messagesContainerRef.current.scrollTo({
+      top: messagesContainerRef.current.scrollHeight,
+      behavior: "smooth",
+    });
   }, [messages, sending, isOpen]);
 
   const sendChatMessage = useCallback(
@@ -148,10 +151,10 @@ export function ChatWidget({ defaultOpen = false }: ChatWidgetProps) {
       {isOpen && (
         <section
           aria-label="Panel Asisten AI KawalWarga"
-          className="fixed inset-x-0 bottom-0 top-0 z-50 flex flex-col overflow-hidden bg-stone-50 shadow-2xl sm:inset-auto sm:bottom-20 sm:right-5 sm:h-[560px] sm:max-h-[calc(100vh-6.5rem)] sm:w-[380px] sm:rounded-2xl sm:border sm:border-stone-200"
+          className="fixed inset-x-0 bottom-0 top-0 z-50 flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-stone-50 shadow-2xl sm:inset-auto sm:bottom-20 sm:right-5 sm:h-[560px] sm:max-h-[560px] sm:w-[380px] sm:rounded-2xl sm:border sm:border-stone-200"
         >
           {/* Header Hijau Tua */}
-          <div className="flex items-center justify-between gap-3 bg-emerald-800 px-4 py-3.5 text-white">
+          <div className="flex shrink-0 items-center justify-between gap-3 bg-emerald-800 px-4 py-3.5 text-white">
             <div className="flex items-center gap-3 min-w-0">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-600/70 bg-emerald-700/80">
                 <Leaf className="h-5 w-5 text-white" aria-hidden="true" />
@@ -177,7 +180,7 @@ export function ChatWidget({ defaultOpen = false }: ChatWidgetProps) {
           </div>
 
           {/* Baris Chip Cepat */}
-          <div className="border-b border-stone-200 bg-white px-4 py-3 space-y-2">
+          <div className="shrink-0 border-b border-stone-200 bg-white px-4 py-3 space-y-2">
             <p className="text-[11px] font-medium text-stone-500">
               Mulai dengan pertanyaan cepat
             </p>
@@ -197,7 +200,10 @@ export function ChatWidget({ defaultOpen = false }: ChatWidgetProps) {
           </div>
 
           {/* Area Pesan */}
-          <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3.5">
+          <div
+            ref={messagesContainerRef}
+            className="flex-1 space-y-3 overflow-y-auto px-4 py-3.5"
+          >
             <p className="text-center text-[11px] text-stone-400">
               Hari ini · 10.45 WIB
             </p>
@@ -327,11 +333,11 @@ export function ChatWidget({ defaultOpen = false }: ChatWidgetProps) {
               </div>
             )}
 
-            <div ref={messagesEndRef} />
+            <div ref={messagesContainerRef} />
           </div>
 
           {/* Input Area & Catatan Kaki */}
-          <div className="border-t border-stone-200 bg-white px-3.5 pb-2.5 pt-3 space-y-1.5">
+          <div className="shrink-0 border-t border-stone-200 bg-white px-3.5 pb-2.5 pt-3 space-y-1.5">
             <form
               onSubmit={handleFormSubmit}
               className="flex items-center gap-2 rounded-xl border border-stone-200 bg-stone-50/70 px-3.5 py-1.5 focus-within:border-emerald-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-600/20"
