@@ -9,16 +9,22 @@ import {
   mockAdminReanalyzeReport,
   mockAdminRegenerateInsight,
   mockAdminRejectReport,
+  mockAdminListOfficers,
+  mockAdminCreateOfficer,
+  mockAdminUpdateOfficerStatus,
 } from "../../mocks";
 import type {
   AdminListParams,
   AdminReportDetail,
   AdminReportListItem,
   ApproveReportPayload,
+  CreateOfficerPayload,
   DashboardAiInsight,
   DashboardDateParams,
   DashboardMapPin,
   DashboardSummary,
+  OfficerListResponse,
+  OfficerUser,
   Paginated,
   RejectReportPayload,
   ReportAiAnalysis,
@@ -187,4 +193,45 @@ export async function regenerateInsight(
       body: params,
     }
   );
+}
+
+// ==========================================
+// Manajemen Petugas
+// ==========================================
+
+export async function listOfficers(): Promise<OfficerListResponse> {
+  if (isMockEnabled()) {
+    return mockAdminListOfficers();
+  }
+
+  return apiRequest<OfficerListResponse>("/admin/officers", {
+    method: "GET",
+  });
+}
+
+export async function createOfficer(
+  payload: CreateOfficerPayload
+): Promise<OfficerUser> {
+  if (isMockEnabled()) {
+    return mockAdminCreateOfficer(payload);
+  }
+
+  return apiRequest<OfficerUser>("/admin/officers", {
+    method: "POST",
+    body: payload,
+  });
+}
+
+export async function updateOfficerStatus(
+  id: number,
+  isActive: boolean
+): Promise<OfficerUser> {
+  if (isMockEnabled()) {
+    return mockAdminUpdateOfficerStatus(id, isActive);
+  }
+
+  return apiRequest<OfficerUser>(`/admin/officers/${id}/status`, {
+    method: "PATCH",
+    body: { is_active: isActive },
+  });
 }

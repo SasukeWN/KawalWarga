@@ -12,6 +12,8 @@ import {
   ListChecks,
   Briefcase,
   MapPin,
+  Users,
+  UserCheck,
 } from "lucide-react";
 import { APP_CONFIG } from "@/lib/config";
 
@@ -66,6 +68,11 @@ export const STAFF_MENU_ITEMS: Record<StaffRole, NavMenuItem[]> = {
       label: "Kelola Kategori",
       icon: Tags,
     },
+    {
+      href: "/admin/petugas",
+      label: "Kelola Petugas",
+      icon: Users,
+    },
   ],
   petugas: [
     {
@@ -78,6 +85,11 @@ export const STAFF_MENU_ITEMS: Record<StaffRole, NavMenuItem[]> = {
       href: "/petugas/tugas-saya",
       label: "Tugas Saya",
       icon: Briefcase,
+    },
+    {
+      href: "/petugas/profil",
+      label: "Profil & Keamanan",
+      icon: UserCheck,
     },
   ],
 };

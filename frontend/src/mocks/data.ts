@@ -25,12 +25,15 @@ import type {
   DashboardSummary,
   LoginPayload,
   LoginResponse,
+  CreateOfficerPayload,
   OfficerCompletePayload,
+  OfficerListResponse,
   OfficerMyReportsParams,
   OfficerProgressPayload,
   OfficerQueueParams,
   OfficerReportDetail,
   OfficerReportListItem,
+  OfficerUser,
   Paginated,
   RejectReportPayload,
   ReportAiAnalysis,
@@ -47,6 +50,7 @@ import type {
   TimelineItem,
   TrackedReport,
   UpdateCategoryPayload,
+  UpdatePasswordPayload,
   User,
 } from "../lib/types";
 
@@ -54,7 +58,7 @@ export function mockDelay(ms = 400): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export const MOCK_USERS: Record<string, { user: User; password: string }> = {
+export const MOCK_USERS: Record<string, { user: User & { is_active?: boolean }; password: string }> = {
   "admin@kawalwarga.test": {
     password: "password123",
     user: {
@@ -63,6 +67,7 @@ export const MOCK_USERS: Record<string, { user: User; password: string }> = {
       email: "admin@kawalwarga.test",
       role: "admin",
       position: "Admin verifikator",
+      is_active: true,
     },
   },
   "budi@kawalwarga.test": {
@@ -73,6 +78,7 @@ export const MOCK_USERS: Record<string, { user: User; password: string }> = {
       email: "budi@kawalwarga.test",
       role: "petugas",
       position: "Petugas lapangan",
+      is_active: true,
     },
   },
 };
@@ -1506,6 +1512,10 @@ export async function mockLogin(payload: LoginPayload): Promise<LoginResponse> {
     throw new ApiError(401, "Email atau password salah.");
   }
 
+  if (entry.user.is_active === false) {
+    throw new ApiError(403, "Akun Anda telah ditangguhkan. Silakan hubungi admin.");
+  }
+
   const rolePrefix = entry.user.role === "admin" ? "1|admin" : "2|petugas";
   return {
     token: `${rolePrefix}_mock_token_kawalwarga`,
@@ -2295,4 +2305,171 @@ export async function mockChatbotSendMessage(
       "Halo! Saya asisten AI KawalWarga. Anda dapat mengetikkan ID tiket (seperti #ADU-891) untuk mengecek progres laporan, mengirim nomor WhatsApp jika lupa ID tiket, atau menanyakan cara melapor.",
     tickets: [],
   };
+}
+
+// ==========================================
+// Mock Manajemen Petugas & Profil
+// ==========================================
+
+export async function mockAdminListOfficers(): Promise<OfficerListResponse> {
+  await mockDelay(300);
+
+  const officers: OfficerUser[] = Object.values(MOCK_USERS)
+    .filter((e) => e.user.role === "petugas")
+    .map((e) => {
+      const u = e.user;
+      const inProg = reportsStore.filter(
+        (r) => r.handler?.name === u.name && r.status === "diproses"
+      ).length;
+      const comp = reportsStore.filter(
+        (r) => r.handler?.name === u.name && r.status === "selesai"
+      ).length;
+
+      return {
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        position: u.position,
+        is_active: u.is_active !== false,
+        tasks_in_progress_count: inProg,
+        tasks_completed_count: comp,
+        created_at: "2026-11-08T08:00:00+07:00",
+      };
+    });
+
+  const total = officers.length;
+  const active = officers.filter((o) => o.is_active).length;
+  const suspended = total - active;
+
+  return {
+    summary: { total, active, suspended },
+    officers,
+  };
+}
+
+export async function mockAdminCreateOfficer(
+  payload: CreateOfficerPayload
+): Promise<OfficerUser> {
+  await mockDelay(350);
+
+  const email = payload.email.trim().toLowerCase();
+  if (!email || !email.includes("@")) {
+    throw new ApiError(422, "Data yang dikirim tidak valid.", {
+      email: ["Format email tidak valid."],
+    });
+  }
+  if (MOCK_USERS[email]) {
+    throw new ApiError(422, "Data yang dikirim tidak valid.", {
+      email: ["Email sudah terdaftar."],
+    });
+  }
+  if (!payload.password || payload.password.length < 6) {
+    throw new ApiError(422, "Data yang dikirim tidak valid.", {
+      password: ["Kata sandi minimal 6 karakter."],
+    });
+  }
+
+  const nextId =
+    Math.max(...Object.values(MOCK_USERS).map((e) => e.user.id), 0) + 1;
+  const name =
+    payload.name?.trim() ||
+    email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const position = payload.position?.trim() || "Petugas lapangan";
+
+  MOCK_USERS[email] = {
+    password: payload.password,
+    user: {
+      id: nextId,
+      name,
+      email,
+      role: "petugas",
+      position,
+      is_active: true,
+    },
+  };
+
+  return {
+    id: nextId,
+    name,
+    email,
+    position,
+    is_active: true,
+    tasks_in_progress_count: 0,
+    tasks_completed_count: 0,
+    created_at: new Date().toISOString(),
+  };
+}
+
+export async function mockAdminUpdateOfficerStatus(
+  id: number,
+  isActive: boolean
+): Promise<OfficerUser> {
+  await mockDelay(300);
+
+  const entry = Object.values(MOCK_USERS).find(
+    (e) => e.user.id === id && e.user.role === "petugas"
+  );
+  if (!entry) {
+    throw new ApiError(404, "Data petugas tidak ditemukan.");
+  }
+
+  entry.user.is_active = isActive;
+
+  return {
+    id: entry.user.id,
+    name: entry.user.name,
+    email: entry.user.email,
+    position: entry.user.position,
+    is_active: isActive,
+    tasks_in_progress_count: 0,
+    tasks_completed_count: 0,
+    created_at: "2026-11-08T08:00:00+07:00",
+  };
+}
+
+export async function mockOfficerGetProfile(): Promise<OfficerUser> {
+  await mockDelay(250);
+  const budi = MOCK_USERS["budi@kawalwarga.test"].user;
+  const inProg = reportsStore.filter(
+    (r) => r.handler?.name === budi.name && r.status === "diproses"
+  ).length;
+  const comp = reportsStore.filter(
+    (r) => r.handler?.name === budi.name && r.status === "selesai"
+  ).length;
+
+  return {
+    id: budi.id,
+    name: budi.name,
+    email: budi.email,
+    position: budi.position,
+    is_active: budi.is_active !== false,
+    tasks_in_progress_count: inProg,
+    tasks_completed_count: comp,
+    created_at: "2026-11-08T08:00:00+07:00",
+  };
+}
+
+export async function mockOfficerUpdatePassword(
+  payload: UpdatePasswordPayload
+): Promise<null> {
+  await mockDelay(350);
+  const budi = MOCK_USERS["budi@kawalwarga.test"];
+  if (budi.password !== payload.current_password) {
+    throw new ApiError(422, "Data yang dikirim tidak valid.", {
+      current_password: ["Kata sandi saat ini tidak cocok."],
+    });
+  }
+  if (!payload.password || payload.password.length < 6) {
+    throw new ApiError(422, "Data yang dikirim tidak valid.", {
+      password: ["Kata sandi baru minimal 6 karakter."],
+    });
+  }
+  if (payload.password !== payload.password_confirmation) {
+    throw new ApiError(422, "Data yang dikirim tidak valid.", {
+      password: ["Konfirmasi kata sandi baru tidak cocok."],
+    });
+  }
+
+  budi.password = payload.password;
+  return null;
 }

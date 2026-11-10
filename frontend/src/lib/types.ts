@@ -401,3 +401,46 @@ export interface OfficerCompletePayload {
   notes: string;
   photo: File;
 }
+
+// ==========================================
+// 8. Manajemen Petugas & Profil
+// ==========================================
+
+export interface OfficerUser {
+  id: number;
+  name: string;
+  email: string;
+  position: string;
+  is_active: boolean;
+  tasks_in_progress_count: number;
+  tasks_completed_count: number;
+  created_at?: string;
+}
+
+export interface OfficerSummary {
+  total: number;
+  active: number;
+  suspended: number;
+}
+
+export interface OfficerListResponse {
+  summary: OfficerSummary;
+  officers: OfficerUser[];
+}
+
+export interface CreateOfficerPayload {
+  email: string;
+  password: string;
+  name?: string;
+  position?: string;
+}
+
+export interface UpdateOfficerStatusPayload {
+  is_active: boolean;
+}
+
+export interface UpdatePasswordPayload {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+}

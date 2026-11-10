@@ -18,6 +18,11 @@ class EnsureRole
             return ApiResponse::error('Belum login atau token tidak valid.', 401);
         }
 
+        if ($user->is_active === false) {
+            $user->tokens()->delete();
+            return ApiResponse::error('Akun Anda telah ditangguhkan. Silakan hubungi admin.', 403);
+        }
+
         $userRole = $user->role instanceof Role ? $user->role->value : (string) $user->role;
 
         if (! in_array($userRole, $roles, true)) {

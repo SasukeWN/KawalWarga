@@ -6,6 +6,8 @@ import {
   mockOfficerProgressReport,
   mockOfficerQueue,
   mockOfficerTakeReport,
+  mockOfficerGetProfile,
+  mockOfficerUpdatePassword,
 } from "../../mocks";
 import type {
   OfficerCompletePayload,
@@ -14,7 +16,9 @@ import type {
   OfficerQueueParams,
   OfficerReportDetail,
   OfficerReportListItem,
+  OfficerUser,
   Paginated,
+  UpdatePasswordPayload,
 } from "../types";
 import { apiRequest, apiRequestEnvelope, isMockEnabled } from "./client";
 
@@ -152,4 +156,31 @@ export async function complete(
       body: formData,
     }
   );
+}
+
+// ==========================================
+// Profil & Keamanan Petugas
+// ==========================================
+
+export async function getProfile(): Promise<OfficerUser> {
+  if (isMockEnabled()) {
+    return mockOfficerGetProfile();
+  }
+
+  return apiRequest<OfficerUser>("/officer/profile", {
+    method: "GET",
+  });
+}
+
+export async function updatePassword(
+  payload: UpdatePasswordPayload
+): Promise<null> {
+  if (isMockEnabled()) {
+    return mockOfficerUpdatePassword(payload);
+  }
+
+  return apiRequest<null>("/officer/profile/password", {
+    method: "PUT",
+    body: payload,
+  });
 }

@@ -24,6 +24,10 @@ class AuthController extends Controller
             return ApiResponse::error('Email atau password salah.', 401);
         }
 
+        if ($user->is_active === false) {
+            return ApiResponse::error('Akun Anda telah ditangguhkan. Silakan hubungi admin.', 403);
+        }
+
         $token = $user->createToken('api-token')->plainTextToken;
 
         return ApiResponse::success([

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import clsx from "clsx";
 import { Bell, Menu } from "lucide-react";
 import { APP_CONFIG } from "@/lib/config";
@@ -92,13 +93,24 @@ export function Topbar({
         >
           <Bell className="h-4 w-4" />
         </button>
-        <div
-          title={`${currentUser.name} (${currentUser.position})`}
-          aria-label={`Profil ${currentUser.name}`}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-800"
-        >
-          {initials}
-        </div>
+        {role === "petugas" ? (
+          <Link
+            href="/petugas/profil"
+            title={`${currentUser.name} (${currentUser.position}) · Buka Profil`}
+            aria-label={`Profil ${currentUser.name}`}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-800 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
+          >
+            {initials}
+          </Link>
+        ) : (
+          <div
+            title={`${currentUser.name} (${currentUser.position})`}
+            aria-label={`Profil ${currentUser.name}`}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-800"
+          >
+            {initials}
+          </div>
+        )}
       </div>
     </header>
   );

@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\V1\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Api\V1\Admin\OfficerController as AdminOfficerController;
 use App\Http\Controllers\Api\V1\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\Officer\ProfileController as OfficerProfileController;
 use App\Http\Controllers\Api\V1\Officer\ReportController as OfficerReportController;
 use App\Http\Controllers\Api\V1\Public\CategoryController as PublicCategoryController;
 use App\Http\Controllers\Api\V1\Public\ChatbotController;
@@ -45,6 +47,10 @@ Route::prefix('v1')->group(function () {
         Route::put('/categories/{slug}', [AdminCategoryController::class, 'update']);
         Route::delete('/categories/{slug}', [AdminCategoryController::class, 'destroy']);
 
+        Route::get('/officers', [AdminOfficerController::class, 'index']);
+        Route::post('/officers', [AdminOfficerController::class, 'store']);
+        Route::patch('/officers/{id}/status', [AdminOfficerController::class, 'updateStatus']);
+
         Route::get('/dashboard/summary', [AdminDashboardController::class, 'summary']);
         Route::get('/dashboard/map', [AdminDashboardController::class, 'map']);
         Route::get('/dashboard/ai-insight', [AdminDashboardController::class, 'aiInsight']);
@@ -61,5 +67,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/reports/{ticket_id}/take', [OfficerReportController::class, 'take']);
         Route::post('/reports/{ticket_id}/progress', [OfficerReportController::class, 'progress']);
         Route::post('/reports/{ticket_id}/complete', [OfficerReportController::class, 'complete']);
+
+        Route::get('/profile', [OfficerProfileController::class, 'show']);
+        Route::put('/profile/password', [OfficerProfileController::class, 'updatePassword']);
     });
 });
