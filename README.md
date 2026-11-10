@@ -49,11 +49,18 @@ Seluruh antarmuka dirancang mengikuti sistem desain Figma (`UI.zip`) dengan duku
   - Dashboard monitoring wilayah: 5 kartu statistik agregat, peta persebaran laporan terverifikasi dengan pin berwarna per status dan popup detail, 3 poin **Ringkasan Eksekutif AI** (dengan tombol generate ulang), serta visualisasi tren kategori.
   - Antrean verifikasi terpadu (`/admin/verifikasi`): kartu navigator tiket, modal perbesar foto asli warga, rekomendasi AI (analisis ringkas, pilihan kategori & urgensi awal), deteksi duplikat laporan terdekat (jarak radius meter), serta kartu keputusan (Setujui ke Petugas atau Tolak dengan alasan wajib).
   - Riwayat seluruh laporan (`/admin/riwayat`): tabel responsif 8 baris per halaman, filter debounced pencarian ID tiket, filter status, kategori, urgensi, rentang tanggal, dan sorting.
+  - **Kelola Petugas Lapangan (`/admin/petugas`)**: Penambahan akun petugas baru (email, kata sandi, nama, posisi), monitoring statistik beban kerja petugas (sedang dikerjakan & tuntas), serta fitur penangguhan (*suspension*) akun non-aktif dengan pencabutan sesi login otomatis.
+  - **Kelola Kategori Laporan (`/admin/kategori`)**: Tambah kategori baru dinamis, ubah label & deskripsi, serta aktivasi/deaktivasi kategori dengan sinkronisasi seketika ke formulir warga dan filter petugas.
 - **Petugas Lapangan (`/petugas`)**:
   - Antrean laporan siap ditangani berurutan berdasarkan urgensi tertinggi (Darurat -> Tinggi -> Sedang -> Rendah), indikator jarak real-time dari lokasi petugas via Geolocation + formula Haversine.
+  - **Filter Antrean & Tugas**: Filter pencarian cepat berdasarkan ID Tiket (debounced), dropdown kategori dinamis, dan tingkat urgensi pada tab Siap Ditangani maupun Tugas Saya.
   - Detail laporan sebelum diambil: rute navigasi Google Maps sekali klik, catatan verifikasi admin, dan aksi ambil laporan secara atomik anti-balapan (*concurrency-safe*).
   - Form penyelesaian tugas (`/petugas/laporan?id=...`): checklist validasi interaktif 2 syarat (unggah 1 foto bukti hasil penanganan + catatan tindakan minimal 10 karakter) sebelum tombol selesai aktif.
   - Manajemen tugas tanggung jawab aktif dan riwayat pekerjaan selesai (`/petugas/tugas-saya`).
+  - **Profil & Keamanan Akun (`/petugas/profil`)**: Ringkasan data diri petugas, statistik laporan ditangani, dan formulir ubah kata sandi mandiri dengan validasi kata sandi saat ini.
+- **Keamanan & Kontrol Akses Terpadu**:
+  - Autentikasi berbasis token Laravel Sanctum dengan perlindungan *Role Guard* terpisah (`admin` dan `petugas`).
+  - Pembatasan login dan pencabutan token aktif seketika jika akun petugas ditangguhkan oleh admin (HTTP 403 Forbidden).
 
 ---
 
@@ -81,8 +88,8 @@ Seluruh antarmuka dirancang mengikuti sistem desain Figma (`UI.zip`) dengan duku
 │   │   └── mock/                   # Foto contoh aset demo
 │   ├── src/
 │   │   ├── app/                    # Routing halaman Next.js (SSG static export)
-│   │   │   ├── admin/              # Dashboard, /admin/verifikasi, /admin/riwayat
-│   │   │   ├── petugas/            # Antrean, /petugas/tugas-saya, /petugas/laporan
+│   │   │   ├── admin/              # Dashboard, verifikasi, riwayat, kategori, petugas
+│   │   │   ├── petugas/            # Antrean, tugas-saya, laporan, profil
 │   │   │   ├── lacak/              # Halaman pelacakan tiket warga
 │   │   │   ├── tanya-ai/           # Halaman chatbot AI warga
 │   │   │   ├── terkirim/           # Bukti laporan sukses terkirim
@@ -319,16 +326,20 @@ Gunakan daftar periksa berikut untuk memverifikasi kesiapan sistem secara menyel
 - [x] Uji tolak laporan pada tiket yang tidak sesuai: isi alasan minimal 10 karakter, status berubah menjadi *"Ditolak"*.
 - [x] Buka menu Dashboard (`/admin`): pastikan angka kartu statistik terbarui, pin lokasi muncul pada peta persebaran, ringkasan eksekutif AI terisi, dan grafik tren kategori bergeser.
 - [x] Buka `/admin/riwayat`: cari ID tiket pada kotak pencarian (debounce 400 ms) dan uji filter status/kategori.
+- [x] Buka `/admin/kategori`: tambah kategori baru dinamis, ubah status aktif/nonaktif, dan pastikan kategori baru langsung tersinkronisasi ke formulir warga dan filter petugas.
+- [x] Buka `/admin/petugas`: tambah akun petugas baru dengan email dan kata sandi, pantau beban penanganan tugas petugas, serta uji tombol tangguhkan akun (akun ditangguhkan tidak dapat login ke sistem).
 
 ### 3. Alur Petugas (Ambil Laporan -> Selesaikan -> Terlihat oleh Warga)
 - [x] Buka `/masuk`, masuk sebagai petugas `budi@kawalwarga.test` / `password123`.
 - [x] Pada halaman `/petugas`, lihat daftar laporan di tab **Siap Ditangani** (diurutkan berdasarkan urgensi tertinggi dan jarak km dari posisi GPS petugas).
+- [x] Uji filter antrean siap ditangani dan tugas saya: filter berdasarkan ID Tiket, Kategori dinamis, dan Tingkat Urgensi.
 - [x] Buka detail laporan: cek catatan verifikasi admin dan tombol rute navigasi Google Maps.
 - [x] Klik tombol *"Ambil & Kerjakan Laporan"* (konfirmasi modal atomik). Status berubah menjadi *"Diproses"* dan muncul di tab **Tugas Saya** (`/petugas/tugas-saya`).
 - [x] Klik laporan yang sedang dikerjakan untuk membuka form penyelesaian (`/petugas/laporan?id=...`).
 - [x] Masukkan catatan tindakan penanganan minimal 10 karakter dan unggah 1 foto bukti hasil pengerjaan.
 - [x] Checklist validasi 2 syarat terpenuhi -> tombol *"Tandai Selesai"* menjadi aktif.
 - [x] Klik *"Tandai Selesai"*, status tiket berubah menjadi *"Selesai"*.
+- [x] Buka menu **Profil & Keamanan** (`/petugas/profil`): periksa rekam jejak tugas lapangan dan uji form ganti kata sandi mandiri (verifikasi kata sandi lama, kata sandi baru minimal 6 karakter, dan konfirmasi kata sandi).
 - [x] Buka kembali halaman publik `/lacak?id=ADU-xxx`: pastikan stepper menunjukkan tahap ke-4 (Selesai), serta komparasi foto **Sebelum** (foto warga) dan **Sesudah** (foto petugas) tampil berdampingan.
 
 ### 4. Alur Chatbot AI (Tanya AI & Cek Tiket)
