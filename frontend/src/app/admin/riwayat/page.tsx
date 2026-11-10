@@ -99,7 +99,7 @@ export default function AdminHistoryPage() {
             registerCategoryLabels(opts);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     };
 
     window.addEventListener("focus", handleFocus);
@@ -216,12 +216,39 @@ export default function AdminHistoryPage() {
     total === 0 ? 0 : Math.min(total, (currentPage - 1) * PER_PAGE + items.length);
 
   const pageNumbers = useMemo(() => {
-    const pages: number[] = [];
-    for (let i = 1; i <= lastPage; i += 1) {
-      pages.push(i);
-    }
-    return pages;
-  }, [lastPage]);
+  // Jika halaman sedikit (<= 7), tampilkan semua
+  if (lastPage <= 7) {
+    return Array.from({ length: lastPage }, (_, i) => i + 1);
+  }
+
+  // Tentukan jendela angka di sekitar halaman saat ini (currentPage +- 1)
+  const pages: (number | string)[] = [];
+  const start = Math.max(2, currentPage - 1);
+  const end = Math.min(lastPage - 1, currentPage + 1);
+
+  // Selalu tampilkan halaman 1
+  pages.push(1);
+
+  // Jika jarak dari 1 ke start lebih dari 1, beri titik-titik
+  if (start > 2) {
+    pages.push("...");
+  }
+
+  // Masukkan angka di sekitar currentPage
+  for (let i = start; i <= end; i += 1) {
+    pages.push(i);
+  }
+
+  // Jika jarak dari end ke lastPage lebih dari 1, beri titik-titik
+  if (end < lastPage - 1) {
+    pages.push("...");
+  }
+
+  // Selalu tampilkan halaman terakhir
+  pages.push(lastPage);
+
+  return pages;
+}, [lastPage, currentPage]);
 
   return (
     <div className="space-y-6">
@@ -614,8 +641,21 @@ export default function AdminHistoryPage() {
                   <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                 </button>
 
-                {pageNumbers.map((num) => {
+                {pageNumbers.map((item, idx) => {
+                  if (item === "...") {
+                    return (
+                      <span
+                        key={`ellipsis-${idx}`}
+                        className="inline-flex h-9 w-6 items-center justify-center text-xs font-bold text-stone-400 select-none"
+                      >
+                        …
+                      </span>
+                    );
+                  }
+
+                  const num = Number(item);
                   const active = num === currentPage;
+
                   return (
                     <button
                       key={num}
