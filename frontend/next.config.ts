@@ -6,9 +6,6 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  experimental: {
-    agentFeedback: true,
-  },
   turbopack: {
     rules: {
       "*.css": {
