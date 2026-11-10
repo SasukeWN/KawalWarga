@@ -139,9 +139,13 @@ export async function apiRequestEnvelope<T>(
             ? "Data tidak ditemukan."
             : response.status === 409
               ? "Konflik status laporan."
-              : response.status === 422
-                ? "Data yang dikirim tidak valid."
-                : "Terjadi kesalahan pada server.");
+              : response.status === 413
+                ? "Ukuran file terlalu besar. Harap unggah foto yang lebih kecil (maks. 5 MB)."
+                : response.status === 422
+                  ? "Data yang dikirim tidak valid."
+                  : response.status === 429
+                    ? "Terlalu banyak permintaan. Mohon tunggu beberapa saat sebelum mencoba lagi."
+                    : "Terjadi kesalahan pada server.");
     throw new ApiError(response.status, message, payload?.errors);
   }
 

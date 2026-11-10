@@ -263,4 +263,83 @@ class HardeningAndContractAuditTest extends TestCase
         $this->assertSame('Budi Santoso', $trackDone['completion']['completed_by']['name']);
         $this->assertCount(5, $trackDone['timeline']);
     }
+
+    public function test_submitting_report_when_gemini_api_key_is_empty_or_broken_falls_back_cleanly_with_201_and_ai_failed(): void
+    {
+        Storage::fake('uploads');
+        config([
+            'services.gemini.api_key' => '', // API key kosong
+            'services.gemini.model'   => 'gemini-test',
+        ]);
+
+        $description = 'Jalan berlubang cukup parah di depan balai warga dan belum pernah ditangani.';
+        $response = $this->post('/api/v1/reports', [
+            'description'    => $description,
+            'latitude'       => -6.2088,
+            'longitude'      => 106.8456,
+            'address_text'   => 'Jl. Warga No. 1',
+            'photo'          => UploadedFile::fake()->image('rusak.jpg'),
+            'reporter_phone' => '081234567890',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.status', 'menunggu_verifikasi');
+
+        $ticketId = $response->json('data.ticket_id');
+        $report   = Report::where('ticket_id', $ticketId)->firstOrFail();
+
+        $this->assertSame('failed', $report->ai_status);
+        $this->assertSame(mb_substr($description, 0, 60), $report->title);
+        $this->assertNull($report->category);
+        $this->assertNull($report->urgency);
+
+        // Chatbot juga merespons dengan fallback saat AI mati
+        $chatRes = $this->postJson('/api/v1/chatbot', [
+            'message' => 'Cek laporan saya ' . $ticketId,
+        ]);
+        $chatRes->assertStatus(200);
+        $this->assertNotEmpty($chatRes->json('data.reply'));
+    }
+
+    public function test_concurrent_take_requests_only_one_succeeds_and_other_gets_409(): void
+    {
+        $report = Report::create([
+            'ticket_id'   => 'ADU-777',
+            'title'       => 'Tiang lampu tumbang',
+            'description' => 'Tiang lampu miring dan hampir tumbang di perempatan jalan.',
+            'photo_path'  => 'reports/777.jpg',
+            'latitude'    => -6.2088,
+            'longitude'   => 106.8456,
+            'status'      => ReportStatus::MENUNGGU_PENANGANAN,
+            'category'    => Category::LAMPU_MATI,
+            'urgency'     => Urgency::DARURAT,
+            'ai_status'   => 'done',
+            'verified_by' => $this->admin->id,
+            'verified_at' => now()->subMinutes(15),
+        ]);
+
+        $otherOfficer = User::factory()->create([
+            'role'     => 'petugas',
+            'position' => 'Petugas cadangan',
+        ]);
+
+        // Petugas 1 (Budi) mengambil laporan -> Sukses 200
+        $res1 = $this->actingAs($this->officer, 'sanctum')
+            ->postJson("/api/v1/officer/reports/{$report->ticket_id}/take");
+
+        $res1->assertStatus(200)
+            ->assertJsonPath('data.status', 'diproses')
+            ->assertJsonPath('data.handler.name', 'Budi Santoso');
+
+        // Petugas 2 (Other) mencoba mengambil laporan yang sama -> 409 Conflict
+        $this->app['auth']->forgetGuards();
+        $res2 = $this->actingAs($otherOfficer, 'sanctum')
+            ->postJson("/api/v1/officer/reports/{$report->ticket_id}/take");
+
+        $res2->assertStatus(409)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Laporan sudah diambil petugas lain.',
+            ]);
+    }
 }

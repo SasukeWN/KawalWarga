@@ -221,9 +221,9 @@ function AdminVerificationContent() {
     { value: string; label: string }[]
   >(CATEGORY_OPTIONS);
   const [selectedCategory, setSelectedCategory] =
-    useState<ReportCategory>("jalan_rusak");
+    useState<ReportCategory | "">("");
   const [selectedUrgency, setSelectedUrgency] =
-    useState<ReportUrgency>("tinggi");
+    useState<ReportUrgency | "">("");
   const [reanalyzing, setReanalyzing] = useState(false);
 
   useEffect(() => {
@@ -262,10 +262,10 @@ function AdminVerificationContent() {
   const [rejecting, setRejecting] = useState(false);
 
   const syncFormWithReport = useCallback((detail: AdminReportDetail) => {
-    const initialCat: ReportCategory =
-      detail.verification?.category ?? detail.ai.category ?? "jalan_rusak";
-    const initialUrg: ReportUrgency =
-      detail.verification?.urgency ?? detail.ai.urgency ?? "tinggi";
+    const initialCat: ReportCategory | "" =
+      detail.verification?.category ?? detail.ai.category ?? "";
+    const initialUrg: ReportUrgency | "" =
+      detail.verification?.urgency ?? detail.ai.urgency ?? "";
 
     setCategoryOptions((prev) => {
       if (initialCat && !prev.some((o) => o.value === initialCat)) {
@@ -392,7 +392,7 @@ function AdminVerificationContent() {
   }
 
   async function handleConfirmApprove() {
-    if (!report) return;
+    if (!report || !selectedCategory || !selectedUrgency) return;
     setApproving(true);
     try {
       const currentTicketId = report.ticket_id;
@@ -798,6 +798,9 @@ function AdminVerificationContent() {
                   }
                   className="h-11 w-full appearance-none rounded-xl border border-stone-200 bg-white pl-3.5 pr-10 text-sm font-medium text-stone-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-600"
                 >
+                  <option value="" disabled>
+                    -- Pilih Kategori Permasalahan --
+                  </option>
                   {categoryOptions.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
@@ -904,10 +907,16 @@ function AdminVerificationContent() {
                   size="md"
                   fullWidth
                   icon={<Check className="h-4 w-4" />}
+                  disabled={!selectedCategory || !selectedUrgency}
                   onClick={() => setConfirmApproveOpen(true)}
                 >
                   Setujui &amp; Teruskan ke Petugas
                 </Button>
+                {(!selectedCategory || !selectedUrgency) && (
+                  <p className="text-[11px] font-semibold text-amber-700">
+                    * Pilih kategori dan tingkat urgensi terlebih dahulu untuk menyetujui.
+                  </p>
+                )}
                 <p className="text-[11px] text-emerald-900">
                   Setelah disetujui: Menunggu Penanganan. Petugas dapat
                   mengambil laporan ini.
@@ -1091,7 +1100,7 @@ function AdminVerificationContent() {
       <ConfirmDialog
         open={confirmApproveOpen}
         title={`Setujui & Teruskan ${formatTicket(report.ticket_id)}?`}
-        description={`Laporan akan ditetapkan dengan kategori "${getCategoryLabel(selectedCategory)}" dan urgensi "${getUrgencyLabel(selectedUrgency)}", lalu masuk ke antrean petugas lapangan.`}
+        description={`Laporan akan ditetapkan dengan kategori "${selectedCategory ? getCategoryLabel(selectedCategory) : "-"}" dan urgensi "${selectedUrgency ? getUrgencyLabel(selectedUrgency) : "-"}", lalu masuk ke antrean petugas lapangan.`}
         confirmLabel="Ya, Setujui & Teruskan"
         cancelLabel="Batal"
         loading={approving}
