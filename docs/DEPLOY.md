@@ -205,7 +205,7 @@ Sebelum pengiriman final (atau setelah sesi penjurian bila diperlukan):
 
 ## 8. Sinkronisasi `API-Contract.md` & Catatan Integrasi Frontend
 
-- **Versi Kontrak Aktif**: **`v1.1` (2026-11-08)** — identik antara `docs/API-Contract.md` (root repo) dan `backend/docs/API-Contract.md`.
+- **Versi Kontrak Aktif**: **`v1.1` (2026-11-08)** — tersimpan sebagai satu sumber kebenaran tunggal di [`docs/API-Contract.md`](API-Contract.md).
 - **Hal Penting saat Integrasi Frontend (`Dandy`)**:
   1. **Base URL Frontend**: Set `NEXT_PUBLIC_API_URL=https://api.DOMAINKITA.com/api/v1` saat menjalankan `npm run build` (static export Next.js).
   2. **Header Wajib**: Semua request wajib menyertakan `Accept: application/json`. Untuk endpoint `/admin/*`, `/officer/*`, `/auth/me`, dan `/auth/logout`, sertakan `Authorization: Bearer <token>`.

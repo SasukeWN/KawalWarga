@@ -1,19 +1,55 @@
-# dependencies
-node_modules/
+# ============================================================================
+# KawalWarga Monorepo — Root .gitignore
+# ============================================================================
 
-# next.js
+# Backend (Laravel + SQLite)
+backend/.env
+backend/.env.*
+!backend/.env.example
+backend/database/*.sqlite
+backend/database/*.sqlite-wal
+backend/database/*.sqlite-shm
+backend/public/uploads/*
+!backend/public/uploads/.gitkeep
+!backend/public/uploads/.htaccess
+backend/vendor/
+backend/node_modules/
+backend/storage/*.key
+
+# Frontend (Next.js Static Export)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+!frontend/.env.example
+frontend/*.tsbuildinfo
+
+# Root & Build Artifacts
+node_modules/
 .next/
 out/
+dist/
 build/
-
-# env files
 .env
 .env.local
 .env.*.local
 !.env.example
 
-# misc
+# Internal Prompt Notes
+docs/*-Prompt.md
+
+# OS & Editor Files
 .DS_Store
+Thumbs.db
 *.pem
-*.tsbuildinfo
-next-env.d.ts
+*.log
+*.swp
+*.swo
+.idea/
+.vscode/
+.cursor/
+.nova/
+.zed/

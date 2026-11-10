@@ -100,19 +100,35 @@ Seluruh antarmuka dirancang mengikuti sistem desain Figma (`UI.zip`) dengan duku
 │   ├── database/seeders/           # 204 laporan demo & akun seeder
 │   ├── config/cors.php             # Pengaturan CORS origin domain frontend
 │   └── routes/api.php              # Definisi rute API v1
-├── docs/                           # Dokumentasi spesifikasi & kontrak API
-│   ├── screenshots/                # Tangkapan layar antarmuka utama (11 gambar)
+├── docs/                           # Dokumentasi spesifikasi & kontrak API (Satu Sumber)
+│   ├── design/                     # Referensi layar desain Figma
+│   ├── screenshots/                # Tangkapan layar antarmuka aplikasi (11 gambar)
 │   ├── API-Contract.md             # Acuan tunggal kontrak API v1.1
-│   ├── Backend-PRD.md              # Spesifikasi teknis backend & prompt Gemini
 │   ├── Frontend-PRD.md             # Spesifikasi teknis frontend
+│   ├── Backend-PRD.md              # Spesifikasi teknis backend & prompt Gemini
+│   ├── Integration-PRD.md          # Spesifikasi integrasi monorepo, E2E, & deploy
 │   ├── Design.md                   # Spesifikasi desain visual & token
-│   └── DEPLOY.md                   # Panduan deployment backend cPanel
-└── README.md                       # Dokumentasi utama proyek
+│   ├── DEPLOY.md                   # Panduan deployment gabungan cPanel
+│   └── api-smoke-test.http         # Koleksi request uji manual seluruh endpoint API
+├── scripts/                        # Skrip pemeriksaan kontrak & paket build produksi
+└── README.md                       # Dokumentasi utama monorepo
 ```
 
 ---
 
 ## 💻 Panduan Menjalankan di Komputer Lokal
+
+| Layanan | Perintah | URL |
+|---|---|---|
+| **Backend** | `cd backend && composer install && cp .env.example .env && php artisan key:generate && php artisan migrate:fresh --seed && php artisan serve` | `http://localhost:8000` |
+| **Frontend** | `cd frontend && npm install && npm run dev` | `http://localhost:3000` |
+
+Konfigurasi lokal yang harus cocok:
+
+| File | Isi |
+|---|---|
+| `backend/.env` | `APP_URL=http://localhost:8000`, `FRONTEND_URL=http://localhost:3000`, `DB_DATABASE` (path ke `database/database.sqlite`), `GEMINI_API_KEY`, `GEMINI_MODEL` |
+| `frontend/.env.local` | `NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1`, `NEXT_PUBLIC_USE_MOCK=false` |
 
 ### 1. Menjalankan Frontend
 
@@ -321,6 +337,18 @@ Gunakan daftar periksa berikut untuk memverifikasi kesiapan sistem secara menyel
 - [x] Klik chip cepat *"Lupa ID Tiket"* atau ketik nomor telepon `Saya lupa tiket, nomor saya 081299990198`. Asisten AI mengidentifikasi tiket terkait dan menampilkan daftar kartu tiket.
 - [x] Klik chip cepat *"Cara Melapor"*. Asisten AI memberikan panduan langkah pelaporan yang ringkas dan ramah.
 - [x] Uji batas request: penanganan error 429 atau pesan server ditangani secara ramah di dalam gelembung percakapan.
+
+---
+
+## 📚 Referensi Dokumentasi (`docs/`)
+
+- [`docs/API-Contract.md`](docs/API-Contract.md) — Sumber kebenaran tunggal kontrak API v1.1 (Frontend & Backend).
+- [`docs/Frontend-PRD.md`](docs/Frontend-PRD.md) — Spesifikasi produk & teknis Frontend Next.js.
+- [`docs/Backend-PRD.md`](docs/Backend-PRD.md) — Spesifikasi produk, alur data, & prompt Gemini AI Backend.
+- [`docs/Integration-PRD.md`](docs/Integration-PRD.md) — Rencana penyatuan monorepo, audit kontrak, uji E2E, & penyerahan.
+- [`docs/Design.md`](docs/Design.md) — Panduan desain visual & komponen UI (`docs/design/`).
+- [`docs/DEPLOY.md`](docs/DEPLOY.md) — Panduan deploy ke cPanel & daftar periksa produksi.
+- [`docs/api-smoke-test.http`](docs/api-smoke-test.http) — Koleksi request uji manual seluruh endpoint API.
 
 ---
 
