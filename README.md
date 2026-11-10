@@ -343,6 +343,7 @@ Gunakan daftar periksa berikut untuk memverifikasi kesiapan sistem secara menyel
 ## 📚 Referensi Dokumentasi (`docs/`)
 
 - [`docs/API-Contract.md`](docs/API-Contract.md) — Sumber kebenaran tunggal kontrak API v1.1 (Frontend & Backend).
+- [`docs/LOCAL-DEV.md`](docs/LOCAL-DEV.md) — Panduan setup dev lokal, daftar variabel `.env`, verifikasi `curl`, & troubleshooting.
 - [`docs/Frontend-PRD.md`](docs/Frontend-PRD.md) — Spesifikasi produk & teknis Frontend Next.js.
 - [`docs/Backend-PRD.md`](docs/Backend-PRD.md) — Spesifikasi produk, alur data, & prompt Gemini AI Backend.
 - [`docs/Integration-PRD.md`](docs/Integration-PRD.md) — Rencana penyatuan monorepo, audit kontrak, uji E2E, & penyerahan.
