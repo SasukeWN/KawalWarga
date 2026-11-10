@@ -288,8 +288,8 @@ export interface DashboardSummary {
 export interface DashboardMapPin {
   ticket_id: string;
   title: string;
-  category: ReportCategory;
-  category_label: string;
+  category: ReportCategory | null;
+  category_label: string | null;
   status: Exclude<ReportStatus, "menunggu_verifikasi">;
   status_label: string;
   latitude: number;

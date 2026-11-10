@@ -97,9 +97,26 @@ export function formatTicket(ticketId: string | null | undefined): string {
 }
 
 /**
- * Normalisasi input ID tiket untuk dikirim ke API: hapus "#", spasi, dan ubah ke huruf besar (contoh: "ADU-204").
+ * Normalisasi berbagai bentuk input ID tiket (#adu-204, ADU-204, 204, adu204)
+ * menjadi format kanonik ADU-204 (tanpa #).
  */
 export function normalizeTicketInput(input: string | null | undefined): string {
   if (!input) return "";
-  return input.replace(/#/g, "").replace(/\s+/g, "").toUpperCase();
+  const cleaned = input.replace(/[#\s]+/g, "").toUpperCase();
+  if (!cleaned) return "";
+
+  if (/^\d+$/.test(cleaned)) {
+    const trimmed = cleaned.replace(/^0+/, "");
+    if (!trimmed) return "";
+    return `ADU-${trimmed.padStart(3, "0")}`;
+  }
+
+  const match = cleaned.match(/^ADU-?(\d+)$/);
+  if (match) {
+    const trimmed = match[1].replace(/^0+/, "");
+    if (!trimmed) return "";
+    return `ADU-${trimmed.padStart(3, "0")}`;
+  }
+
+  return cleaned;
 }

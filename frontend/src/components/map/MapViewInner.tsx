@@ -141,7 +141,7 @@ export default function MapViewInner({
                     />
                     <div className="min-w-0">
                       <p className="truncate text-sm font-bold text-stone-900">
-                        {pin.category_label}
+                        {pin.category_label || "Belum Dikategorikan"}
                       </p>
                       <p className="truncate text-xs text-stone-500">
                         {formatTicket(pin.ticket_id)}
