@@ -28,6 +28,25 @@ export function isMockEnabled(): boolean {
 }
 
 export function getApiBaseUrl(): string {
+  if (typeof window !== "undefined") {
+    const custom = (window as unknown as { __KW_API_URL__?: string })
+      .__KW_API_URL__;
+    if (custom) return custom.replace(/\/+$/, "");
+
+    const host = window.location.hostname;
+    const envUrl = process.env.NEXT_PUBLIC_API_URL;
+    const isPlaceholder =
+      !envUrl ||
+      envUrl.includes("DOMAINKITA") ||
+      envUrl.includes("localhost");
+
+    if (host !== "localhost" && host !== "127.0.0.1" && isPlaceholder) {
+      const protocol = window.location.protocol;
+      const cleanHost = host.replace(/^www\./, "");
+      return `${protocol}//api.${cleanHost}/api/v1`;
+    }
+  }
+
   const raw =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
   return raw.replace(/\/+$/, "");
