@@ -54,15 +54,15 @@ export function AppShell({
   return (
     <div className="flex min-h-screen w-full bg-stone-50 text-stone-900">
       {/* Sidebar Desktop */}
-      <div className="hidden lg:flex lg:shrink-0">
+      <aside data-admin-sidebar className="hidden lg:flex lg:w-[260px] lg:shrink-0 flex-col border-r border-stone-200 bg-stone-50/70 min-h-full">
         <Sidebar
           role={role}
           user={effectiveUser}
           activePath={activePath}
           onLogout={handleDefaultLogout}
-          className="sticky top-0 h-screen"
+          className="flex flex-1 flex-col justify-between min-h-full"
         />
-      </div>
+      </aside>
 
       {/* Drawer Sidebar Mobile */}
       {mobileMenuOpen && (

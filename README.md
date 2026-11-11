@@ -11,30 +11,34 @@ Seluruh antarmuka dirancang mengikuti sistem desain Figma (`UI.zip`) dengan duku
 ### 1. Warga (Publik) — Buat Laporan, Bukti Terkirim, & Pelacakan Real-time
 | Buat Laporan (Desktop) | Laporan Terkirim |
 | :---: | :---: |
-| ![Buat Laporan](docs/screenshots/01-buat-laporan-desktop.png) | ![Laporan Terkirim](docs/screenshots/02-laporan-terkirim-desktop.png) |
+| ![Buat Laporan](docs/screenshots/01%20-%20Warga%20%C2%B7%20Buat%20laporan%20%C2%B7%20Desktop.png) | ![Laporan Terkirim](docs/screenshots/02%20-%20Warga%20%C2%B7%20Laporan%20terkirim%20%C2%B7%20Desktop.png) |
 
 | Lacak Laporan — Diproses | Lacak Laporan — Selesai (Sebelum & Sesudah) |
 | :---: | :---: |
-| ![Lacak Laporan Diproses](docs/screenshots/03-lacak-laporan-diproses-desktop.png) | ![Lacak Laporan Selesai](docs/screenshots/04-lacak-laporan-selesai-desktop.png) |
+| ![Lacak Laporan Diproses](docs/screenshots/08%20-%20Warga%20%C2%B7%20Lacak%20laporan%20diproses%20%C2%B7%20Desktop.png) | ![Lacak Laporan Selesai](docs/screenshots/10%20-%20Warga%20%C2%B7%20Lacak%20laporan%20selesai%20%C2%B7%20Desktop.png) |
 
 ### 2. Warga — Asisten Chatbot AI 24 Jam & Pelacakan Ditolak
 | Tanya AI Chatbot (`/tanya-ai`) & Widget | Lacak Laporan — Ditolak dengan Alasan |
 | :---: | :---: |
-| ![Tanya AI Chatbot](docs/screenshots/06-tanya-ai-chatbot-desktop.png) | ![Lacak Laporan Ditolak](docs/screenshots/05-lacak-laporan-ditolak-desktop.png) |
+| ![Tanya AI Chatbot](docs/screenshots/12%20-%20Warga%20%C2%B7%20Tanya%20AI%20%C2%B7%20Desktop.png) | ![Lacak Laporan Ditolak](docs/screenshots/11%20-%20Warga%20%C2%B7%20Lacak%20laporan%20ditolak%20%C2%B7%20Desktop.png) |
 
 ### 3. Admin & Pimpinan — Monitoring Wilayah, Antrean Verifikasi, & Riwayat
 | Dashboard Monitoring & Peta Persebaran Pin | Antrean Verifikasi & Rekomendasi AI |
 | :---: | :---: |
-| ![Dashboard dan Peta Admin](docs/screenshots/07-admin-dashboard-peta-desktop.png) | ![Antrean Verifikasi Admin](docs/screenshots/08-admin-verifikasi-desktop.png) |
+| ![Dashboard dan Peta Admin](docs/screenshots/04%20-%20Admin%20%26%20Pimpinan%20%C2%B7%20Dashboard%20dan%20peta%20%C2%B7%20Desktop.png) | ![Antrean Verifikasi Admin](docs/screenshots/03%20-%20Admin%20%C2%B7%20Antrean%20verifikasi%20%C2%B7%20Desktop.png) |
 
 | Buku Besar Riwayat Seluruh Laporan (`/admin/riwayat`) |
 | :---: |
-| ![Riwayat Seluruh Laporan](docs/screenshots/09-admin-riwayat-desktop.png) |
+| ![Riwayat Seluruh Laporan](docs/screenshots/05%20-%20Admin%20%C2%B7%20Riwayat%20seluruh%20laporan%20%C2%B7%20Desktop.png) |
 
 ### 4. Petugas Lapangan — Antrean Penanganan & Penyelesaian Tugas
-| Antrean Tugas Siap Ditangani (`/petugas`) | Detail Tugas & Form Penyelesaian (`/petugas/laporan`) |
+| Antrean Tugas Siap Ditangani (`/petugas`) | Detail Tugas Sebelum Diambil |
 | :---: | :---: |
-| ![Antrean Petugas](docs/screenshots/10-petugas-antrean-desktop.png) | ![Penyelesaian Tugas Petugas](docs/screenshots/11-petugas-penyelesaian-desktop.png) |
+| ![Antrean Petugas](docs/screenshots/06%20-%20Petugas%20%C2%B7%20Antrean%20penanganan%20%C2%B7%20Desktop.png) | ![Detail Tugas Petugas](docs/screenshots/07%20-%20Petugas%20%C2%B7%20Detail%20sebelum%20diambil%20%C2%B7%20Desktop.png) |
+
+| Tugas Aktif & Form Penyelesaian (`/petugas/laporan`) |
+| :---: |
+| ![Penyelesaian Tugas Petugas](docs/screenshots/09%20-%20Petugas%20%C2%B7%20Tugas%20aktif%20dan%20penyelesaian%20%C2%B7%20Desktop.png) |
 
 ---
 
@@ -108,8 +112,8 @@ Seluruh antarmuka dirancang mengikuti sistem desain Figma (`UI.zip`) dengan duku
 │   ├── config/cors.php             # Pengaturan CORS origin domain frontend
 │   └── routes/api.php              # Definisi rute API v1
 ├── docs/                           # Dokumentasi spesifikasi & kontrak API (Satu Sumber)
-│   ├── design/                     # Referensi layar desain Figma
-│   ├── screenshots/                # Tangkapan layar antarmuka aplikasi (11 gambar)
+│   ├── screenshots/                # Tangkapan layar antarmuka aplikasi (12 alur lengkap)
+│   ├── Logo Kawal Warga.png        # Aset logo resmi KawalWarga
 │   ├── API-Contract.md             # Acuan tunggal kontrak API v1.1
 │   ├── Frontend-PRD.md             # Spesifikasi teknis frontend
 │   ├── Backend-PRD.md              # Spesifikasi teknis backend & prompt Gemini
@@ -358,7 +362,7 @@ Gunakan daftar periksa berikut untuk memverifikasi kesiapan sistem secara menyel
 - [`docs/Frontend-PRD.md`](docs/Frontend-PRD.md) — Spesifikasi produk & teknis Frontend Next.js.
 - [`docs/Backend-PRD.md`](docs/Backend-PRD.md) — Spesifikasi produk, alur data, & prompt Gemini AI Backend.
 - [`docs/Integration-PRD.md`](docs/Integration-PRD.md) — Rencana penyatuan monorepo, audit kontrak, uji E2E, & penyerahan.
-- [`docs/Design.md`](docs/Design.md) — Panduan desain visual & komponen UI (`docs/design/`).
+- [`docs/Design.md`](docs/Design.md) — Panduan desain visual & spesifikasi token antarmuka.
 - [`docs/DEPLOY.md`](docs/DEPLOY.md) — Panduan deploy ke cPanel & daftar periksa produksi.
 - [`docs/api-smoke-test.http`](docs/api-smoke-test.http) — Koleksi request uji manual seluruh endpoint API.
 

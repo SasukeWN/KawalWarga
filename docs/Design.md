@@ -2,7 +2,7 @@
 
 > Acuan visual frontend. Sumber kebenaran visual tetap **Figma (`UI.zip`, 24 layar + logo)**.
 > Dokumen ini merangkum token, komponen, dan aturan per layar supaya implementasi konsisten.
-> Taruh `UI.zip` yang sudah di-extract di `docs/design/` (repo frontend) sebagai referensi.
+> Screenshot antarmuka aplikasi terkini tersedia di `docs/screenshots/`.
 
 ---
 

@@ -41,6 +41,9 @@ build/
 # Internal Prompt Notes
 docs/*-Prompt.md
 
+# Local Test Media
+contoh foto/
+
 # OS & Editor Files
 .DS_Store
 Thumbs.db

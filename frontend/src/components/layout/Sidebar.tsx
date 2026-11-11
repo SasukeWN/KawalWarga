@@ -131,10 +131,10 @@ export function Sidebar({
   };
 
   return (
-    <aside
+    <div
       aria-label={groupLabel}
       className={clsx(
-        "flex w-[260px] shrink-0 flex-col justify-between border-r border-stone-200 bg-stone-50/70 p-4",
+        "flex w-[260px] shrink-0 flex-col justify-between h-full p-4",
         className
       )}
     >
@@ -196,7 +196,7 @@ export function Sidebar({
       </div>
 
       {/* Info Wilayah & Profil Bawah */}
-      <div className="mt-8 space-y-4">
+      <div className="mt-auto pt-6 space-y-4">
         <div className="rounded-2xl bg-stone-100/90 p-4">
           <div className="mb-2 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
             <MapPin className="h-4 w-4" aria-hidden="true" />
@@ -231,6 +231,6 @@ export function Sidebar({
           )}
         </div>
       </div>
-    </aside>
+    </div>
   );
 }
