@@ -4,41 +4,42 @@ Platform pengaduan dan pemantauan masalah infrastruktur & lingkungan publik mode
 
 ---
 
-## 📸 Tangkapan Layar Antarmuka Utama
+## 📸 Tangkapan Layar Alur Sistem Terpadu (End-to-End)
 
-Seluruh antarmuka dirancang mengikuti sistem desain Figma (`UI.zip`) dengan dukungan penuh tampilan Desktop maupun Perangkat Bergerak (Seluler).
+Dokumentasi visual alur pengaduan dan penanganan masalah infrastruktur (*Studi Kasus: Jalan Rusak*) secara lengkap dari sisi Warga, Admin Verifikator, hingga Petugas Lapangan.
 
-### 1. Warga (Publik) — Buat Laporan, Bukti Terkirim, & Pelacakan Real-time
-| Buat Laporan (Desktop) | Laporan Terkirim |
+### 1. Warga (Publik) — Pengajuan Laporan & Bukti Tiket
+| 01. Form Buat Laporan (Desktop) | 02. Bukti Laporan Terkirim (#ADU-204) |
 | :---: | :---: |
-| ![Buat Laporan](docs/screenshots/01%20-%20Warga%20%C2%B7%20Buat%20laporan%20%C2%B7%20Desktop.png) | ![Laporan Terkirim](docs/screenshots/02%20-%20Warga%20%C2%B7%20Laporan%20terkirim%20%C2%B7%20Desktop.png) |
+| ![01 - Buat Laporan](docs/screenshots/01%20-%20Warga%20%C2%B7%20Buat%20laporan%20%C2%B7%20Desktop.png) | ![02 - Laporan Terkirim](docs/screenshots/02%20-%20Warga%20%C2%B7%20Laporan%20terkirim%20%C2%B7%20Desktop.png) |
 
-| Lacak Laporan — Diproses | Lacak Laporan — Selesai (Sebelum & Sesudah) |
+### 2. Admin & Pimpinan — Verifikasi AI, Monitoring, & Buku Besar
+| 03. Antrean Verifikasi & Rekomendasi AI | 04. Dashboard & Peta Persebaran Pin |
 | :---: | :---: |
-| ![Lacak Laporan Diproses](docs/screenshots/08%20-%20Warga%20%C2%B7%20Lacak%20laporan%20diproses%20%C2%B7%20Desktop.png) | ![Lacak Laporan Selesai](docs/screenshots/10%20-%20Warga%20%C2%B7%20Lacak%20laporan%20selesai%20%C2%B7%20Desktop.png) |
+| ![03 - Antrean Verifikasi](docs/screenshots/03%20-%20Admin%20%C2%B7%20Antrean%20verifikasi%20%C2%B7%20Desktop.png) | ![04 - Dashboard dan Peta](docs/screenshots/04%20-%20Admin%20%26%20Pimpinan%20%C2%B7%20Dashboard%20dan%20peta%20%C2%B7%20Desktop.png) |
 
-### 2. Warga — Asisten Chatbot AI 24 Jam & Pelacakan Ditolak
-| Tanya AI Chatbot (`/tanya-ai`) & Widget | Lacak Laporan — Ditolak dengan Alasan |
-| :---: | :---: |
-| ![Tanya AI Chatbot](docs/screenshots/12%20-%20Warga%20%C2%B7%20Tanya%20AI%20%C2%B7%20Desktop.png) | ![Lacak Laporan Ditolak](docs/screenshots/11%20-%20Warga%20%C2%B7%20Lacak%20laporan%20ditolak%20%C2%B7%20Desktop.png) |
-
-### 3. Admin & Pimpinan — Monitoring Wilayah, Antrean Verifikasi, & Riwayat
-| Dashboard Monitoring & Peta Persebaran Pin | Antrean Verifikasi & Rekomendasi AI |
-| :---: | :---: |
-| ![Dashboard dan Peta Admin](docs/screenshots/04%20-%20Admin%20%26%20Pimpinan%20%C2%B7%20Dashboard%20dan%20peta%20%C2%B7%20Desktop.png) | ![Antrean Verifikasi Admin](docs/screenshots/03%20-%20Admin%20%C2%B7%20Antrean%20verifikasi%20%C2%B7%20Desktop.png) |
-
-| Buku Besar Riwayat Seluruh Laporan (`/admin/riwayat`) |
+| 05. Buku Besar Riwayat Seluruh Laporan (`/admin/riwayat`) |
 | :---: |
-| ![Riwayat Seluruh Laporan](docs/screenshots/05%20-%20Admin%20%C2%B7%20Riwayat%20seluruh%20laporan%20%C2%B7%20Desktop.png) |
+| ![05 - Riwayat Seluruh Laporan](docs/screenshots/05%20-%20Admin%20%C2%B7%20Riwayat%20seluruh%20laporan%20%C2%B7%20Desktop.png) |
 
-### 4. Petugas Lapangan — Antrean Penanganan & Penyelesaian Tugas
-| Antrean Tugas Siap Ditangani (`/petugas`) | Detail Tugas Sebelum Diambil |
+### 3. Petugas Lapangan — Antrean Penanganan & Navigasi Tugas
+| 06. Antrean Tugas Siap Ditangani | 07. Detail Tugas & Navigasi Sebelum Diambil |
 | :---: | :---: |
-| ![Antrean Petugas](docs/screenshots/06%20-%20Petugas%20%C2%B7%20Antrean%20penanganan%20%C2%B7%20Desktop.png) | ![Detail Tugas Petugas](docs/screenshots/07%20-%20Petugas%20%C2%B7%20Detail%20sebelum%20diambil%20%C2%B7%20Desktop.png) |
+| ![06 - Antrean Petugas](docs/screenshots/06%20-%20Petugas%20%C2%B7%20Antrean%20penanganan%20%C2%B7%20Desktop.png) | ![07 - Detail Tugas](docs/screenshots/07%20-%20Petugas%20%C2%B7%20Detail%20sebelum%20diambil%20%C2%B7%20Desktop.png) |
 
-| Tugas Aktif & Form Penyelesaian (`/petugas/laporan`) |
+### 4. Pelacakan Real-time & Bukti Penyelesaian Transparan
+| 08. Lacak Laporan — Status Diproses Warga | 09. Form Bukti Penyelesaian Petugas |
+| :---: | :---: |
+| ![08 - Lacak Laporan Diproses](docs/screenshots/08%20-%20Warga%20%C2%B7%20Lacak%20laporan%20diproses%20%C2%B7%20Desktop.png) | ![09 - Penyelesaian Petugas](docs/screenshots/09%20-%20Petugas%20%C2%B7%20Tugas%20aktif%20dan%20penyelesaian%20%C2%B7%20Desktop.png) |
+
+| 10. Lacak Laporan — Selesai (Foto Sebelum vs Sesudah) |
 | :---: |
-| ![Penyelesaian Tugas Petugas](docs/screenshots/09%20-%20Petugas%20%C2%B7%20Tugas%20aktif%20dan%20penyelesaian%20%C2%B7%20Desktop.png) |
+| ![10 - Laporan Selesai](docs/screenshots/10%20-%20Warga%20%C2%B7%20Lacak%20laporan%20selesai%20%C2%B7%20Desktop.png) |
+
+### 5. Fitur Pendukung — Penolakan Terverifikasi & Tanya AI Chatbot
+| 11. Lacak Laporan — Ditolak dengan Alasan | 12. Asisten Chatbot Tanya AI 24 Jam (`/tanya-ai`) |
+| :---: | :---: |
+| ![11 - Laporan Ditolak](docs/screenshots/11%20-%20Warga%20%C2%B7%20Lacak%20laporan%20ditolak%20%C2%B7%20Desktop.png) | ![12 - Tanya AI](docs/screenshots/12%20-%20Warga%20%C2%B7%20Tanya%20AI%20%C2%B7%20Desktop.png) |
 
 ---
 
