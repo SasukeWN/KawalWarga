@@ -204,9 +204,7 @@ export function ChatWidget({ defaultOpen = false }: ChatWidgetProps) {
             ref={messagesContainerRef}
             className="flex-1 space-y-3 overflow-y-auto px-4 py-3.5"
           >
-            <p className="text-center text-[11px] text-stone-400">
-              Hari ini · 10.45 WIB
-            </p>
+            
 
             {messages.map((msg) => {
               if (msg.role === "user") {
