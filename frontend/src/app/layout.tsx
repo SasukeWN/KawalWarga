@@ -19,7 +19,12 @@ export const metadata: Metadata = {
   },
   description: `Platform pengaduan publik berbasis AI untuk ${APP_CONFIG.agencyName} ${APP_CONFIG.regionName}.`,
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/logo.png", sizes: "500x500", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/logo.png",
   },
 };
 
