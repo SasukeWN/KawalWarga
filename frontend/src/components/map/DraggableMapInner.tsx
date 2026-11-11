@@ -120,7 +120,7 @@ export default function DraggableMapInner({
       </MapContainer>
 
       {/* Badge Pojok Kiri Bawah Sesuai Figma */}
-      <div className="pointer-events-none absolute bottom-3 left-3 z-[400] rounded-xl border border-stone-200/80 bg-white/95 px-3 py-1.5 shadow-sm backdrop-blur-xs">
+      <div className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-xl border border-stone-200/80 bg-white/95 px-3 py-1.5 shadow-sm backdrop-blur-xs">
         <p className="text-xs font-bold text-stone-900">
           Geser pin ke lokasi kejadian
         </p>
