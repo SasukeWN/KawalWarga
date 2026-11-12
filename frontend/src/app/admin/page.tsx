@@ -88,14 +88,11 @@ function formatRangeUpper(from: string, to: string): string {
 function DashboardSkeleton() {
   return (
     <div className="space-y-6" aria-busy="true" aria-label="Memuat dashboard">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5 lg:gap-4">
-        {Array.from({ length: 5 }).map((_, i) => (
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6 lg:gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton
             key={i}
-            className={clsx(
-              "h-36 rounded-2xl",
-              i === 0 && "col-span-2 lg:col-span-1"
-            )}
+            className="h-36 rounded-2xl"
           />
         ))}
       </div>
@@ -340,12 +337,11 @@ export default function AdminDashboardPage() {
             totals && (
               <div
                 className={clsx(
-                  "grid grid-cols-2 gap-3 lg:grid-cols-5 lg:gap-4",
+                  "grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6 lg:gap-4",
                   loading && "opacity-60 transition-opacity"
                 )}
               >
                 <StatCard
-                  className="col-span-2 lg:col-span-1"
                   label="Total Laporan Masuk"
                   value={totals.all}
                   dotColor="emerald"
@@ -358,7 +354,7 @@ export default function AdminDashboardPage() {
                   helperText="Perlu keputusan admin"
                 />
                 <StatCard
-                  label="Sedang Diproses Petugas"
+                  label="Sedang Diproses"
                   value={totals.diproses}
                   dotColor="orange"
                   helperText="Dikerjakan di lapangan"
@@ -370,9 +366,15 @@ export default function AdminDashboardPage() {
                   helperText={`${donePercent}% dari seluruh laporan`}
                 />
                 <StatCard
+                  label="Laporan Melewati Target"
+                  value={totals.melewati_target ?? 0}
+                  dotColor="rose"
+                  helperText="Melebihi batas SLA"
+                />
+                <StatCard
                   label="Laporan Ditolak"
                   value={totals.ditolak}
-                  dotColor="rose"
+                  dotColor="stone"
                   helperText="Dengan alasan verifikasi"
                 />
               </div>

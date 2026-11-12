@@ -128,4 +128,79 @@ class Report extends Model
 
         return $urgency?->label();
     }
+
+    /**
+     * Dapatkan objek Urgency efektif (mengutamakan urgency admin, lalu ai_urgency, default Urgency::SEDANG).
+     */
+    public function getEffectiveUrgency(): Urgency
+    {
+        $raw = $this->urgency ?? $this->ai_urgency;
+        if ($raw instanceof Urgency) {
+            return $raw;
+        }
+        if (is_string($raw) && $raw !== '') {
+            $parsed = Urgency::tryFrom($raw);
+            if ($parsed) {
+                return $parsed;
+            }
+        }
+
+        return Urgency::SEDANG;
+    }
+
+    /**
+     * Target waktu penanganan (SLA) dalam jam berdasarkan urgensi.
+     */
+    public function getSlaTargetHoursAttribute(): int
+    {
+        return $this->getEffectiveUrgency()->slaHours();
+    }
+
+    /**
+     * Label manusiawi target SLA (contoh: "24 Jam", "3 Hari", "7 Hari").
+     */
+    public function getSlaTargetLabelAttribute(): string
+    {
+        return $this->getEffectiveUrgency()->slaLabel();
+    }
+
+    /**
+     * Batas waktu (deadline) SLA penanganan dihitung dari created_at + slaTargetHours.
+     */
+    public function getSlaDeadlineAttribute(): ?\Carbon\CarbonInterface
+    {
+        if (! $this->created_at) {
+            return null;
+        }
+
+        return $this->created_at->copy()->addHours($this->sla_target_hours);
+    }
+
+    /**
+     * Menentukan apakah laporan melewati batas SLA (terlambat).
+     * - Ditolak: tidak pernah dianggap terlambat.
+     * - Selesai: terlambat jika completed_at > sla_deadline.
+     * - Aktif (menunggu verifikasi, menunggu penanganan, diproses): terlambat jika now() > sla_deadline.
+     */
+    public function getIsOverdueAttribute(): bool
+    {
+        $status = $this->status instanceof ReportStatus
+            ? $this->status
+            : ReportStatus::tryFrom((string) $this->status);
+
+        if ($status === ReportStatus::DITOLAK) {
+            return false;
+        }
+
+        $deadline = $this->sla_deadline;
+        if (! $deadline) {
+            return false;
+        }
+
+        if ($status === ReportStatus::SELESAI) {
+            return $this->completed_at ? $this->completed_at->gt($deadline) : false;
+        }
+
+        return now()->gt($deadline);
+    }
 }

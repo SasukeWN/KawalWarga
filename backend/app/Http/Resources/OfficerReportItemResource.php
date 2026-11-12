@@ -31,21 +31,25 @@ class OfficerReportItemResource extends JsonResource
             : ($this->urgency ? Urgency::tryFrom((string) $this->urgency) : null);
 
         $data = [
-            'ticket_id'      => $this->ticket_id,
-            'title'          => $this->title,
-            'status'         => $status->value,
-            'status_label'   => $status->label(),
-            'category'       => $category?->value,
-            'category_label' => $category?->label(),
-            'urgency'        => $urgency?->value,
-            'urgency_label'  => $urgency?->label(),
-            'photo_url'      => $this->photo_url,
-            'location'       => [
+            'ticket_id'        => $this->ticket_id,
+            'title'            => $this->title,
+            'status'           => $status->value,
+            'status_label'     => $status->label(),
+            'category'         => $category?->value,
+            'category_label'   => $category?->label(),
+            'urgency'          => $urgency?->value,
+            'urgency_label'    => $urgency?->label(),
+            'photo_url'        => $this->photo_url,
+            'location'         => [
                 'latitude'     => (float) $this->latitude,
                 'longitude'    => (float) $this->longitude,
                 'address_text' => $this->address_text,
             ],
-            'verified_at'    => $this->verified_at?->toIso8601String(),
+            'verified_at'      => $this->verified_at?->toIso8601String(),
+            'is_overdue'       => $this->is_overdue,
+            'sla_target_hours' => $this->sla_target_hours,
+            'sla_target_label' => $this->sla_target_label,
+            'sla_deadline'     => $this->sla_deadline?->toIso8601String(),
         ];
 
         if ($this->includeTaskTimestamps) {

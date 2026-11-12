@@ -237,6 +237,13 @@ export interface AdminListParams {
   per_page?: number;
 }
 
+export interface ReportSlaInfo {
+  target_hours: number;
+  target_label: string;
+  deadline: string | null;
+  is_overdue: boolean;
+}
+
 export interface AdminReportListItem {
   ticket_id: string;
   title: string;
@@ -248,6 +255,10 @@ export interface AdminReportListItem {
   urgency_label: string | null;
   address_text: string | null;
   created_at: string;
+  is_overdue?: boolean;
+  sla_target_hours?: number;
+  sla_target_label?: string;
+  sla_deadline?: string | null;
 }
 
 export interface AdminReportDetail {
@@ -266,6 +277,8 @@ export interface AdminReportDetail {
     phone: string | null;
   };
   received_at: string;
+  is_overdue?: boolean;
+  sla?: ReportSlaInfo | null;
   ai: ReportAiAnalysis;
   verification: ReportVerification | null;
   rejection: ReportRejection | null;
@@ -307,6 +320,7 @@ export interface DashboardSummary {
     diproses: number;
     selesai: number;
     ditolak: number;
+    melewati_target?: number;
   };
   by_category: DashboardCategoryCount[];
 }
@@ -371,6 +385,10 @@ export interface OfficerReportListItem {
   verified_at: string;
   taken_at?: string | null;
   completed_at?: string | null;
+  is_overdue?: boolean;
+  sla_target_hours?: number;
+  sla_target_label?: string;
+  sla_deadline?: string | null;
 }
 
 export interface OfficerReportDetail {
@@ -386,6 +404,8 @@ export interface OfficerReportDetail {
   photo_url: string;
   location: ReportLocation;
   received_at: string;
+  is_overdue?: boolean;
+  sla?: ReportSlaInfo | null;
   verification: ReportVerification;
   rejection: ReportRejection | null;
   handler: ReportHandler | null;

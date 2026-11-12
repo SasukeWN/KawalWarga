@@ -537,7 +537,15 @@ export default function AdminHistoryPage() {
                         </td>
 
                         <td className="whitespace-nowrap px-3 py-4">
-                          <StatusChip status={item.status} size="sm" />
+                          <div className="flex flex-col items-start gap-1">
+                            <StatusChip status={item.status} size="sm" />
+                            {item.is_overdue && (
+                              <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-700">
+                                <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
+                                Terlambat
+                              </span>
+                            )}
+                          </div>
                         </td>
 
                         <td className="whitespace-nowrap px-3 py-4 text-stone-600">
@@ -595,8 +603,14 @@ export default function AdminHistoryPage() {
                     {formatShortAddress(item.address_text)}
                   </p>
 
-                  <div className="pt-0.5">
+                  <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                     <StatusChip status={item.status} size="sm" />
+                    {item.is_overdue && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-700">
+                        <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
+                        Terlambat
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between pt-1 text-xs">

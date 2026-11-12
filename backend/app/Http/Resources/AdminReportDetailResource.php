@@ -130,6 +130,13 @@ class AdminReportDetailResource extends JsonResource
                 'phone' => $this->reporter_phone,
             ],
             'received_at'    => $this->created_at?->toIso8601String(),
+            'is_overdue'     => $this->is_overdue,
+            'sla'            => [
+                'target_hours' => $this->sla_target_hours,
+                'target_label' => $this->sla_target_label,
+                'deadline'     => $this->sla_deadline?->toIso8601String(),
+                'is_overdue'   => $this->is_overdue,
+            ],
             'ai'             => [
                 'status'     => (string) $this->ai_status,
                 'summary'    => $aiDone ? $this->ai_summary : null,

@@ -645,7 +645,13 @@ function AdminVerificationContent() {
         <h2 className="text-xl font-extrabold tracking-tight text-stone-900 sm:text-2xl">
           Pemeriksaan {formatTicket(report.ticket_id)}
         </h2>
-        <div>
+        <div className="flex flex-wrap items-center gap-2">
+          {report.is_overdue && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-xs font-bold text-rose-700 shadow-2xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
+              Terlambat (SLA {report.sla?.target_label || "Melebihi Target"})
+            </span>
+          )}
           <StatusChip status={report.status} />
         </div>
       </div>

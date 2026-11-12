@@ -1545,6 +1545,41 @@ export async function mockMe(): Promise<User> {
 // 3. Mock Admin
 // ==========================================
 
+function computeSla(
+  urg: ReportUrgency | null,
+  receivedAt: string,
+  status: string,
+  completedAt?: string | null
+) {
+  const hours =
+    urg === "darurat" ? 24 : urg === "tinggi" ? 72 : urg === "rendah" ? 336 : 168;
+  const label =
+    urg === "darurat"
+      ? "24 Jam"
+      : urg === "tinggi"
+      ? "3 Hari"
+      : urg === "rendah"
+      ? "14 Hari"
+      : "7 Hari";
+  const deadline = new Date(new Date(receivedAt).getTime() + hours * 3600 * 1000);
+  let is_overdue = false;
+  if (status === "ditolak") {
+    is_overdue = false;
+  } else if (status === "selesai") {
+    is_overdue = completedAt
+      ? new Date(completedAt).getTime() > deadline.getTime()
+      : false;
+  } else {
+    is_overdue = Date.now() > deadline.getTime();
+  }
+  return {
+    sla_target_hours: hours,
+    sla_target_label: label,
+    sla_deadline: deadline.toISOString(),
+    is_overdue,
+  };
+}
+
 export async function mockAdminListReports(
   params: AdminListParams = {}
 ): Promise<Paginated<AdminReportListItem>> {
@@ -1618,6 +1653,7 @@ export async function mockAdminListReports(
   const items: AdminReportListItem[] = sliced.map((r) => {
     const effCat = getEffectiveCategory(r);
     const effUrg = getEffectiveUrgency(r);
+    const sla = computeSla(effUrg, r.received_at, r.status, r.completion?.completed_at);
     return {
       ticket_id: r.ticket_id,
       title: r.title,
@@ -1629,6 +1665,7 @@ export async function mockAdminListReports(
       urgency_label: effUrg ? getUrgencyLabel(effUrg) : null,
       address_text: r.location.address_text,
       created_at: r.received_at,
+      ...sla,
     };
   });
 
@@ -1793,6 +1830,7 @@ export async function mockAdminDashboardSummary(
       diproses,
       selesai,
       ditolak,
+      melewati_target: 3,
     },
     by_category: [
       { category: "jalan_rusak", label: "Jalan Rusak", count: 90 },
@@ -1929,6 +1967,7 @@ export async function mockOfficerQueue(
   const items: OfficerReportListItem[] = sliced.map((r) => {
     const cat = getEffectiveCategory(r) ?? "jalan_rusak";
     const urg = getEffectiveUrgency(r) ?? "sedang";
+    const sla = computeSla(urg, r.received_at, r.status, r.completion?.completed_at);
     return {
       ticket_id: r.ticket_id,
       title: r.title,
@@ -1941,6 +1980,7 @@ export async function mockOfficerQueue(
       photo_url: r.photo_url,
       location: { ...r.location },
       verified_at: r.verification?.verified_at ?? r.received_at,
+      ...sla,
     };
   });
 
@@ -2008,6 +2048,7 @@ export async function mockOfficerMyReports(
   const items: OfficerReportListItem[] = sliced.map((r) => {
     const cat = getEffectiveCategory(r) ?? "jalan_rusak";
     const urg = getEffectiveUrgency(r) ?? "sedang";
+    const sla = computeSla(urg, r.received_at, r.status, r.completion?.completed_at);
     return {
       ticket_id: r.ticket_id,
       title: r.title,
@@ -2022,6 +2063,7 @@ export async function mockOfficerMyReports(
       verified_at: r.verification?.verified_at ?? r.received_at,
       taken_at: r.handler?.taken_at ?? null,
       completed_at: r.completion?.completed_at ?? null,
+      ...sla,
     };
   });
 

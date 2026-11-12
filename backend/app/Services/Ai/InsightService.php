@@ -33,6 +33,11 @@ class InsightService
             ->groupBy('status')
             ->pluck('aggregate', 'status');
 
+        $reportsInPeriod = Report::query()
+            ->whereBetween('created_at', [$start, $end])
+            ->where('status', '!=', ReportStatus::DITOLAK)
+            ->get(['id', 'status', 'urgency', 'ai_urgency', 'created_at', 'completed_at']);
+
         $totals = [
             'all'                 => 0,
             'menunggu_verifikasi' => (int) ($statusRows[ReportStatus::MENUNGGU_VERIFIKASI->value] ?? 0),
@@ -40,6 +45,7 @@ class InsightService
             'diproses'            => (int) ($statusRows[ReportStatus::DIPROSES->value] ?? 0),
             'selesai'             => (int) ($statusRows[ReportStatus::SELESAI->value] ?? 0),
             'ditolak'             => (int) ($statusRows[ReportStatus::DITOLAK->value] ?? 0),
+            'melewati_target'     => $reportsInPeriod->filter(fn (Report $report) => $report->is_overdue)->count(),
         ];
 
         $totals['all'] = $totals['menunggu_verifikasi']

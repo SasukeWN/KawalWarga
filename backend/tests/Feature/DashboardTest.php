@@ -25,10 +25,17 @@ class DashboardTest extends TestCase
     {
         parent::setUp();
         config(['app.url' => 'http://localhost:8000']);
+        Carbon::setTestNow('2026-11-08 12:00:00');
         $this->seed(UserSeeder::class);
 
         $this->admin      = User::where('email', 'admin@kawalwarga.test')->firstOrFail();
         $this->adminToken = $this->admin->createToken('admin')->plainTextToken;
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     public function test_dashboard_summary_counts_correctly_and_respects_date_filter(): void
@@ -62,6 +69,7 @@ class DashboardTest extends TestCase
                         'diproses'            => 1,
                         'selesai'             => 1,
                         'ditolak'             => 1,
+                        'melewati_target'     => 0,
                     ],
                     'by_category' => [
                         ['category' => 'jalan_rusak', 'label' => 'Jalan Rusak', 'count' => 2],
@@ -70,6 +78,39 @@ class DashboardTest extends TestCase
                     ],
                 ],
             ]);
+    }
+
+    public function test_dashboard_summary_counts_overdue_reports_correctly(): void
+    {
+        // 1. Darurat (SLA 24 jam): dibuat 2 hari lalu, masih menunggu penanganan -> OVERDUE
+        $r1 = $this->createSampleReport('ADU-D1', ReportStatus::MENUNGGU_PENANGANAN, Category::JALAN_RUSAK, '2026-11-06T10:00:00+07:00');
+        $r1->update(['urgency' => Urgency::DARURAT]);
+
+        // 2. Tinggi (SLA 72 jam): dibuat 4 hari lalu, masih diproses -> OVERDUE
+        $r2 = $this->createSampleReport('ADU-T1', ReportStatus::DIPROSES, Category::SAMPAH, '2026-11-04T10:00:00+07:00');
+        $r2->update(['urgency' => Urgency::TINGGI]);
+
+        // 3. Darurat (SLA 24 jam): dibuat 6 jam lalu, menunggu penanganan -> ON TIME (bukan overdue)
+        $r3 = $this->createSampleReport('ADU-D2', ReportStatus::MENUNGGU_PENANGANAN, Category::LAMPU_MATI, '2026-11-08T06:00:00+07:00');
+        $r3->update(['urgency' => Urgency::DARURAT]);
+
+        // 4. Selesai terlambat: dibuat 2026-11-02, darurat (deadline 2026-11-03), selesai 2026-11-05 -> OVERDUE
+        $r4 = $this->createSampleReport('ADU-S1', ReportStatus::SELESAI, Category::JALAN_RUSAK, '2026-11-02T10:00:00+07:00');
+        $r4->update([
+            'urgency'      => Urgency::DARURAT,
+            'completed_at' => Carbon::parse('2026-11-05T10:00:00+07:00'),
+        ]);
+
+        // 5. Ditolak: dibuat 5 hari lalu darurat, tetapi ditolak -> NOT OVERDUE
+        $r5 = $this->createSampleReport('ADU-R1', ReportStatus::DITOLAK, Category::SAMPAH, '2026-11-03T10:00:00+07:00');
+        $r5->update(['urgency' => Urgency::DARURAT]);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->getJson('/api/v1/admin/dashboard/summary?from=2026-11-01&to=2026-11-08');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.totals.all', 5)
+            ->assertJsonPath('data.totals.melewati_target', 3);
     }
 
     public function test_dashboard_map_excludes_menunggu_verifikasi(): void
