@@ -23,6 +23,7 @@ export interface TopbarProps {
   user?: StaffUserDisplay;
   title?: string;
   subtitle?: string;
+  unverifiedCount?: number;
   onOpenMobileMenu?: () => void;
   className?: string;
 }
@@ -32,6 +33,7 @@ export function Topbar({
   user,
   title,
   subtitle,
+  unverifiedCount,
   onOpenMobileMenu,
   className,
 }: TopbarProps) {
@@ -89,9 +91,14 @@ export function Topbar({
         <button
           type="button"
           aria-label="Notifikasi"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full text-stone-600 hover:bg-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
+          className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-stone-600 hover:bg-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
         >
           <Bell className="h-4 w-4" />
+          {typeof unverifiedCount === "number" && unverifiedCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+              {unverifiedCount > 99 ? "99+" : unverifiedCount}
+            </span>
+          )}
         </button>
         {role === "petugas" ? (
           <Link

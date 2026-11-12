@@ -35,11 +35,11 @@ export function PublicHeader({ className }: PublicHeaderProps) {
               <img
                 src="/logo.png"
                 alt={APP_CONFIG.appName}
-                className="h-auto w-full scale-[1.12] object-cover object-center"
+                className="h-auto w-full scale-[0.85] object-contain object-left"
               />
             </span>
-            <span className="hidden sm:inline-block h-6 w-px bg-stone-200" aria-hidden="true" />
-            <span className="text-[11px] md:text-xs font-medium text-stone-500 leading-tight">
+            <span className="hidden lg:inline-block h-6 w-px bg-stone-200 shrink-0" aria-hidden="true" />
+            <span className="hidden lg:inline-block text-xs font-medium text-stone-500 whitespace-nowrap">
               {APP_CONFIG.agencyName} · {APP_CONFIG.regionName}
             </span>
           </Link>

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { APP_CONFIG } from "@/lib/config";
 import { AuthProvider } from "@/lib/auth";
 import { ToastProvider } from "@/components/ui/Toast";
+import { PageLoadProvider } from "@/components/layout/PageLoadProvider";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
@@ -39,7 +40,9 @@ export default function RootLayout({
         className={`${inter.className} min-h-full flex flex-col bg-stone-50 text-stone-900`}
       >
         <ToastProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <PageLoadProvider>{children}</PageLoadProvider>
+          </AuthProvider>
         </ToastProvider>
       </body>
     </html>

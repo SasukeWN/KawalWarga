@@ -102,7 +102,7 @@ export default function StaffLoginPage() {
               <img
                 src="/logo.png"
                 alt={APP_CONFIG.appName}
-                className="h-auto w-full scale-[1.12] object-cover object-center"
+                className="h-auto w-full scale-[0.85] object-contain object-center"
               />
             </span>
             <span className="mt-1 text-xs font-medium text-stone-500">

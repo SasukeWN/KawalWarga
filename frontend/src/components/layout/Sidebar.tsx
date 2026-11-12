@@ -98,6 +98,7 @@ export interface SidebarProps {
   role: StaffRole;
   user?: StaffUserDisplay;
   activePath?: string;
+  unverifiedCount?: number;
   onNavigate?: () => void;
   onLogout?: () => void;
   className?: string;
@@ -107,6 +108,7 @@ export function Sidebar({
   role,
   user,
   activePath,
+  unverifiedCount,
   onNavigate,
   onLogout,
   className,
@@ -150,7 +152,7 @@ export function Sidebar({
               <img
                 src="/logo.png"
                 alt={APP_CONFIG.appName}
-                className="h-auto w-full scale-[1.12] object-cover object-center"
+                className="h-auto w-full scale-[0.88] object-contain object-left"
               />
             </span>
             <p className="mt-0.5 text-[11px] font-medium text-stone-500">
@@ -188,6 +190,13 @@ export function Sidebar({
                     )}
                   />
                   <span>{item.label}</span>
+                  {item.href === "/admin/verifikasi" &&
+                    typeof unverifiedCount === "number" &&
+                    unverifiedCount > 0 && (
+                      <span className="ml-auto inline-flex items-center justify-center rounded-full bg-amber-100 border border-amber-200/80 px-2 py-0.5 text-xs font-bold text-amber-800">
+                        {unverifiedCount > 99 ? "99+" : unverifiedCount}
+                      </span>
+                    )}
                 </Link>
               );
             })}

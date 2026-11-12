@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { APP_CONFIG } from "@/lib/config";
 import { useAuth } from "@/lib/auth";
+import { listReports } from "@/lib/api/admin";
 import { Sidebar, type StaffRole, type StaffUserDisplay } from "./Sidebar";
 import { Topbar } from "./Topbar";
 
@@ -30,6 +31,28 @@ export function AppShell({
   const router = useRouter();
   const { user: authUser, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [unverifiedCount, setUnverifiedCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (role !== "admin") return;
+    let isMounted = true;
+
+    async function fetchUnverified() {
+      try {
+        const res = await listReports({
+          status: "menunggu_verifikasi",
+          per_page: 1,
+        });
+        if (isMounted && typeof res.meta?.total === "number") {
+          setUnverifiedCount(res.meta.total);
+        }
+      } catch {
+        // Abaikan bila belum login / token belum siap
+      }
+    }
+
+    fetchUnverified();
+  }, [role, activePath]);
 
   const effectiveUser: StaffUserDisplay | undefined =
     user ??
@@ -54,13 +77,14 @@ export function AppShell({
   return (
     <div className="flex min-h-screen w-full bg-stone-50 text-stone-900">
       {/* Sidebar Desktop */}
-      <aside data-admin-sidebar className="hidden lg:flex lg:w-[260px] lg:shrink-0 flex-col border-r border-stone-200 bg-stone-50/70 min-h-full">
+      <aside data-admin-sidebar className="hidden lg:flex lg:w-[260px] lg:shrink-0 flex-col border-r border-stone-200 bg-stone-50/70 sticky top-0 h-screen">
         <Sidebar
           role={role}
           user={effectiveUser}
           activePath={activePath}
+          unverifiedCount={unverifiedCount}
           onLogout={handleDefaultLogout}
-          className="flex flex-1 flex-col justify-between min-h-full"
+          className="flex flex-1 flex-col justify-between"
         />
       </aside>
 
@@ -90,6 +114,7 @@ export function AppShell({
               role={role}
               user={effectiveUser}
               activePath={activePath}
+              unverifiedCount={unverifiedCount}
               onNavigate={() => setMobileMenuOpen(false)}
               onLogout={handleDefaultLogout}
               className="min-h-full border-r-0"
@@ -105,6 +130,7 @@ export function AppShell({
           user={effectiveUser}
           title={topbarTitle}
           subtitle={topbarSubtitle}
+          unverifiedCount={unverifiedCount}
           onOpenMobileMenu={() => setMobileMenuOpen(true)}
         />
         <main className="flex-1 px-4 py-6 md:px-8 md:py-8">

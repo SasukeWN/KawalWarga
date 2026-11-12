@@ -43,6 +43,7 @@ docs/*-Prompt.md
 
 # Local Test Media
 contoh foto/
+scripts/generate_all_screenshots.mjs
 
 # OS & Editor Files
 .DS_Store
