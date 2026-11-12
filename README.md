@@ -9,7 +9,7 @@ Platform pengaduan dan pemantauan masalah infrastruktur & lingkungan publik mode
 Dokumentasi visual alur pengaduan dan penanganan masalah infrastruktur (*Studi Kasus: Jalan Rusak*) secara lengkap dari sisi Warga, Admin Verifikator, hingga Petugas Lapangan.
 
 ### 1. Warga (Publik) — Pengajuan Laporan & Bukti Tiket
-| 01. Form Buat Laporan (Desktop) | 02. Bukti Laporan Terkirim (#ADU-204) |
+| 01. Form Buat Laporan (Desktop) | 02. Bukti Laporan Terkirim (#ADU-205) |
 | :---: | :---: |
 | ![01 - Buat Laporan](docs/screenshots/01%20-%20Warga%20%C2%B7%20Buat%20laporan%20%C2%B7%20Desktop.png) | ![02 - Laporan Terkirim](docs/screenshots/02%20-%20Warga%20%C2%B7%20Laporan%20terkirim%20%C2%B7%20Desktop.png) |
 
