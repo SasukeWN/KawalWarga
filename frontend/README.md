@@ -34,8 +34,4 @@ Hasil build statis siap unggah akan tersedia di folder `frontend/out/`.
 
 ## Tautan Dokumentasi (`../docs/`)
 
-- [API Contract v1.1 (`../docs/API-Contract.md`)](../docs/API-Contract.md) — Sumber kebenaran tunggal kontrak API.
-- [Frontend PRD (`../docs/Frontend-PRD.md`)](../docs/Frontend-PRD.md) — Spesifikasi halaman, komponen, dan state frontend.
-- [Design System (`../docs/Design.md`)](../docs/Design.md) — Token warna, tipografi, dan acuan desain Figma.
-- [Integration PRD (`../docs/Integration-PRD.md`)](../docs/Integration-PRD.md) — Rencana penyatuan, uji E2E, dan penyerahan.
-- [Panduan Deploy (`../docs/DEPLOY.md`)](../docs/DEPLOY.md) — Panduan deploy cPanel & checklist produksi.
+- [Panduan Dev Lokal (`../docs/LOCAL-DEV.md`)](../docs/LOCAL-DEV.md) — Setup dev lokal, variabel `.env`, & troubleshooting.

@@ -112,16 +112,10 @@ Dokumentasi visual alur pengaduan dan penanganan masalah infrastruktur (*Studi K
 │   ├── database/seeders/           # 204 laporan demo & akun seeder
 │   ├── config/cors.php             # Pengaturan CORS origin domain frontend
 │   └── routes/api.php              # Definisi rute API v1
-├── docs/                           # Dokumentasi spesifikasi & kontrak API (Satu Sumber)
+├── docs/                           # Aset dokumentasi & panduan dev lokal
 │   ├── screenshots/                # Tangkapan layar antarmuka aplikasi (12 alur lengkap)
 │   ├── Logo Kawal Warga.png        # Aset logo resmi KawalWarga
-│   ├── API-Contract.md             # Acuan tunggal kontrak API v1.1
-│   ├── Frontend-PRD.md             # Spesifikasi teknis frontend
-│   ├── Backend-PRD.md              # Spesifikasi teknis backend & prompt Gemini
-│   ├── Integration-PRD.md          # Spesifikasi integrasi monorepo, E2E, & deploy
-│   ├── Design.md                   # Spesifikasi desain visual & token
-│   ├── DEPLOY.md                   # Panduan deployment gabungan cPanel
-│   └── api-smoke-test.http         # Koleksi request uji manual seluruh endpoint API
+│   └── LOCAL-DEV.md                # Panduan setup dev lokal & troubleshooting
 ├── scripts/                        # Skrip pemeriksaan kontrak & paket build produksi
 └── README.md                       # Dokumentasi utama monorepo
 ```
@@ -358,14 +352,7 @@ Gunakan daftar periksa berikut untuk memverifikasi kesiapan sistem secara menyel
 
 ## 📚 Referensi Dokumentasi (`docs/`)
 
-- [`docs/API-Contract.md`](docs/API-Contract.md) — Sumber kebenaran tunggal kontrak API v1.1 (Frontend & Backend).
 - [`docs/LOCAL-DEV.md`](docs/LOCAL-DEV.md) — Panduan setup dev lokal, daftar variabel `.env`, verifikasi `curl`, & troubleshooting.
-- [`docs/Frontend-PRD.md`](docs/Frontend-PRD.md) — Spesifikasi produk & teknis Frontend Next.js.
-- [`docs/Backend-PRD.md`](docs/Backend-PRD.md) — Spesifikasi produk, alur data, & prompt Gemini AI Backend.
-- [`docs/Integration-PRD.md`](docs/Integration-PRD.md) — Rencana penyatuan monorepo, audit kontrak, uji E2E, & penyerahan.
-- [`docs/Design.md`](docs/Design.md) — Panduan desain visual & spesifikasi token antarmuka.
-- [`docs/DEPLOY.md`](docs/DEPLOY.md) — Panduan deploy ke cPanel & daftar periksa produksi.
-- [`docs/api-smoke-test.http`](docs/api-smoke-test.http) — Koleksi request uji manual seluruh endpoint API.
 
 ---
 
