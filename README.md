@@ -1,6 +1,37 @@
 # KawalWarga — Platform Pengaduan Publik Berbasis AI
 
-Platform pengaduan dan pemantauan masalah infrastruktur & lingkungan publik modern untuk **Dinas Prasarana & Lingkungan · Kota Harmoni**. Dibangun untuk kompetisi hackathon (deadline 15 November 2026), platform ini menghubungkan warga, admin verifikator, dan petugas lapangan dengan dukungan rekomendasi kecerdasan buatan (*AI Recommendation & Assistance*).
+Platform pengaduan dan pemantauan masalah infrastruktur & lingkungan publik berbasis web untuk **Dinas Prasarana & Lingkungan · Kota Tangerang**, dikembangkan untuk **LOGICODIX 2026 Hackathon Competition**. KawalWarga menghubungkan **Warga**, **Admin Verifikator**, dan **Petugas Lapangan** dalam satu alur kerja transparan dengan dukungan **Google Gemini AI** (`gemini-3.5-flash-lite`) untuk triase laporan otomatis, deteksi duplikasi berbasis lokasi, ringkasan eksekutif, serta asisten chatbot 24 jam.
+
+| Informasi Kompetisi | Keterangan |
+| :--- | :--- |
+| **Kompetisi** | LOGICODIX 2026 Hackathon Competition |
+| **Kategori Lomba** | **Web** — Subtema 5: *Civic Tech & Community Service* |
+| **Nama Aplikasi** | **KawalWarga** |
+| **Nama Tim** | `Plantera` |
+| **Anggota Tim** | 1. **Ilyasa Ramadhany Ekaputra Ismail** (Backend & AI Lead)<br>2. **Dandy Ghaisan Vidyanto** (Frontend Lead) |
+| **Instansi** | Program Studi Teknik Informatika — **Universitas Pamulang** |
+
+---
+
+## 🎯 Masalah yang Diangkat, Solusi, & Target Pengguna
+
+### Masalah yang Diangkat
+1. **Pelaporan Lambat & Kurang Transparan**: Warga kesulitan memantau sejauh mana aduan infrastruktur/lingkungan mereka ditindaklanjuti serta jarang memperoleh bukti visual kondisi sebelum dan sesudah perbaikan.
+2. **Beban Triase & Duplikasi Laporan**: Admin instansi harus menyaring aduan masuk secara manual, menentukan kategori/tingkat urgensi, dan kerap menerima laporan ganda untuk titik lokasi yang sama.
+3. **Pengawasan Target Waktu (SLA) Belum Terukur**: Tanpa target waktu per tingkat urgensi, laporan berstatus darurat berisiko menumpuk atau melewati batas penanganan.
+
+### Deskripsi Solusi
+**KawalWarga** menyediakan alur pengaduan end-to-end berbasis peta interaktif:
+- **Warga** dapat melapor cepat tanpa login (cukup foto terkompresi, deskripsi, dan pin lokasi peta), lalu melacak progres melalui ID tiket atau asisten **Tanya AI**.
+- **AI Multimodal (`gemini-3.5-flash-lite`)** menganalisis foto dan deskripsi laporan baru untuk menghasilkan judul ringkas, rekomendasi kategori, tingkat urgensi awal, serta mendeteksi kandidat laporan duplikat dalam radius **150 meter** menggunakan formula Haversine.
+- **Admin Verifikator & Petugas Lapangan** bekerja pada satu sistem berbasis SLA (*Darurat*: 24 jam, *Tinggi*: 3 hari, *Sedang*: 7 hari, *Rendah*: 14 hari) lengkap dengan notifikasi badge antrean verifikasi, peta sebaran, dan bukti foto penyelesaian *Sebelum vs Sesudah*.
+
+### Target Pengguna
+| Peran Pengguna | Kebutuhan Utama yang Difasilitasi |
+| :--- | :--- |
+| **Warga / Masyarakat Umum (Kota Tangerang)** | Mengirim aduan infrastruktur/lingkungan tanpa login, memantau progres 4 tahap, melihat foto bukti selesai, dan bertanya ke Chatbot AI 24 jam. |
+| **Admin Verifikator & Pimpinan Dinas** | Memverifikasi laporan masuk dengan rekomendasi AI & peringatan duplikat, memantau peta sebaran, SLA keterlambatan, ringkasan eksekutif AI, serta mengelola kategori dan akun petugas. |
+| **Petugas Lapangan** | Melihat antrean tugas siap ditangani yang terurut berdasarkan urgensi & jarak GPS terdekat, mengambil tugas secara atomik, memperbarui progres, dan mengunggah foto bukti penyelesaian. |
 
 ---
 
@@ -43,53 +74,152 @@ Dokumentasi visual alur pengaduan dan penanganan masalah infrastruktur (*Studi K
 
 ---
 
-## 🚀 Fitur Unggulan
+## 🚀 Fitur Utama yang Diimplementasikan
 
 - **Warga (Publik)**:
-  - Form pelaporan cepat tanpa login: kompresi foto otomatis di sisi klien (maks sisi 1600 px, target `< 1.5 MB`), penentuan titik presisi peta Leaflet (pin dapat digeser & tombol *"Gunakan Lokasi Saya Saat Ini"*), alamat otomatis via reverse geocoding, serta input nomor WhatsApp opsional.
-  - Halaman bukti terkirim dengan tombol salin tiket dan integrasi tombol *"Simpan ke WhatsApp"* (`wa.me`).
-  - Halaman lacak status multi-kondisi (`menunggu_verifikasi`, `menunggu_penanganan`, `diproses`, `selesai`, `ditolak`) dengan stepper 4 langkah, perbandingan foto Sebelum/Sesudah pengerjaan, kartu kabar terbaru petugas, dan riwayat linimasa waktu.
-  - Asisten Chatbot AI (`/tanya-ai`) dan widget melayang 24 jam dengan chip pertanyaan cepat (*Cek Status Tiket*, *Lupa ID Tiket via WA*, *Cara Melapor*), tautan kartu tiket interaktif, dan penanganan rate limit ramah.
+  - **Form Pelaporan Cepat Tanpa Login**: Kompresi foto otomatis di sisi klien (maks sisi `1600 px`, target `< 1.5 MB`), penentuan titik presisi peta Leaflet (pin dapat digeser & tombol *"Gunakan Lokasi Saya Saat Ini"*), pengisian alamat otomatis via reverse geocoding Nominatim OpenStreetMap, pilihan kategori dinamis, serta input nomor WhatsApp opsional.
+  - **Bukti Terkirim Interaktif (`/terkirim`)**: ID tiket otomatis (`#ADU-xxx`), tombol salin tiket, dan tautan *"Simpan ke WhatsApp"* (`wa.me`).
+  - **Pelacakan Transparan (`/lacak`)**: Mendukung 5 status (`menunggu_verifikasi`, `menunggu_penanganan`, `diproses`, `selesai`, `ditolak`) dengan stepper 4 langkah, indikator target waktu SLA, perbandingan foto **Sebelum vs Sesudah** pengerjaan, kartu kabar terbaru petugas, dan linimasa waktu lengkap.
+  - **Asisten Chatbot Tanya AI (`/tanya-ai` & Widget Melayang)**: Chip pertanyaan cepat (*Cek Status Tiket*, *Lupa ID Tiket via WA*, *Cara Melapor*), pencarian tiket via ID atau nomor WhatsApp terdaftar, kartu tiket interaktif ke `/lacak`, dan penanganan rate limit ramah.
 - **Admin Verifikator (`/admin`)**:
-  - Dashboard monitoring wilayah: 5 kartu statistik agregat, peta persebaran laporan terverifikasi dengan pin berwarna per status dan popup detail, 3 poin **Ringkasan Eksekutif AI** (dengan tombol generate ulang), serta visualisasi tren kategori.
-  - Antrean verifikasi terpadu (`/admin/verifikasi`): kartu navigator tiket, modal perbesar foto asli warga, rekomendasi AI (analisis ringkas, pilihan kategori & urgensi awal), deteksi duplikat laporan terdekat (jarak radius meter), serta kartu keputusan (Setujui ke Petugas atau Tolak dengan alasan wajib).
-  - Riwayat seluruh laporan (`/admin/riwayat`): tabel responsif 8 baris per halaman, filter debounced pencarian ID tiket, filter status, kategori, urgensi, rentang tanggal, dan sorting.
-  - **Kelola Petugas Lapangan (`/admin/petugas`)**: Penambahan akun petugas baru (email, kata sandi, nama, posisi), monitoring statistik beban kerja petugas (sedang dikerjakan & tuntas), serta fitur penangguhan (*suspension*) akun non-aktif dengan pencabutan sesi login otomatis.
-  - **Kelola Kategori Laporan (`/admin/kategori`)**: Tambah kategori baru dinamis, ubah label & deskripsi, serta aktivasi/deaktivasi kategori dengan sinkronisasi seketika ke formulir warga dan filter petugas.
+  - **Notifikasi Badge Antrean Verifikasi**: Badge jumlah laporan belum diverifikasi pada *Sidebar* dan ikon lonceng *Topbar* Admin yang selalu ter-update saat navigasi.
+  - **Dashboard Monitoring Wilayah & SLA**: Kartu statistik agregat termasuk indikator laporan **Melewati Target (SLA Overdue)**, peta persebaran laporan dengan pin berwarna per status, 3 poin **Ringkasan Eksekutif AI** (dengan tombol generate ulang), serta grafik tren kategori.
+  - **Antrean Verifikasi Terpadu (`/admin/verifikasi`)**: Navigator tiket, modal perbesar foto resolusi tinggi, rekomendasi AI (judul, kategori, urgensi awal, ringkasan, plus tombol analisis ulang), peringatan deteksi duplikat radius 150 m, serta kartu keputusan (*Setujui & Teruskan* atau *Tolak* dengan alasan wajib).
+  - **Riwayat Seluruh Laporan (`/admin/riwayat`)**: Tabel responsif 8 baris per halaman dengan pencarian ID tiket (*debounced*), filter status, kategori, urgensi, rentang tanggal, dan pengurutan.
+  - **Kelola Kategori Laporan (`/admin/kategori`)**: Tambah kategori dinamis, ubah label & deskripsi, serta aktivasi/deaktivasi kategori dengan sinkronisasi seketika ke form warga dan filter petugas.
+  - **Kelola Petugas Lapangan (`/admin/petugas`)**: Tambah akun petugas baru, pantau beban tugas aktif & tuntas, serta penangguhan (*suspension*) akun dengan pencabutan token login seketika.
 - **Petugas Lapangan (`/petugas`)**:
-  - Antrean laporan siap ditangani berurutan berdasarkan urgensi tertinggi (Darurat -> Tinggi -> Sedang -> Rendah), indikator jarak real-time dari lokasi petugas via Geolocation + formula Haversine.
-  - **Filter Antrean & Tugas**: Filter pencarian cepat berdasarkan ID Tiket (debounced), dropdown kategori dinamis, dan tingkat urgensi pada tab Siap Ditangani maupun Tugas Saya.
-  - Detail laporan sebelum diambil: rute navigasi Google Maps sekali klik, catatan verifikasi admin, dan aksi ambil laporan secara atomik anti-balapan (*concurrency-safe*).
-  - Form penyelesaian tugas (`/petugas/laporan?id=...`): checklist validasi interaktif 2 syarat (unggah 1 foto bukti hasil penanganan + catatan tindakan minimal 10 karakter) sebelum tombol selesai aktif.
-  - Manajemen tugas tanggung jawab aktif dan riwayat pekerjaan selesai (`/petugas/tugas-saya`).
-  - **Profil & Keamanan Akun (`/petugas/profil`)**: Ringkasan data diri petugas, statistik laporan ditangani, dan formulir ubah kata sandi mandiri dengan validasi kata sandi saat ini.
-- **Keamanan & Kontrol Akses Terpadu**:
-  - Autentikasi berbasis token Laravel Sanctum dengan perlindungan *Role Guard* terpisah (`admin` dan `petugas`).
-  - Pembatasan login dan pencabutan token aktif seketika jika akun petugas ditangguhkan oleh admin (HTTP 403 Forbidden).
+  - **Antrean Penanganan Prioritas & Jarak GPS**: Urutan otomatis berdasarkan bobot urgensi tertinggi (`Darurat` -> `Tinggi` -> `Sedang` -> `Rendah`), perhitungan jarak real-time dari GPS petugas menggunakan formula Haversine, serta filter ID tiket, kategori, dan urgensi.
+  - **Detail & Pengambilan Tugas Atomik**: Rute navigasi langsung ke Google Maps, catatan verifikasi admin, target SLA penanganan, serta pengambilan laporan secara atomik untuk mencegah bentrokan antarpengambil (*concurrency-safe*).
+  - **Pembaruan Progres & Penyelesaian (`/petugas/laporan?id=...`)**: Catatan progres berkala serta checklist validasi wajib (1 foto bukti hasil penanganan + catatan tindakan minimal 10 karakter) sebelum menandai tugas selesai.
+  - **Tugas Saya (`/petugas/tugas-saya`) & Profil (`/petugas/profil`)**: Manajemen pekerjaan aktif/selesai, statistik kinerja petugas, dan fitur ganti kata sandi mandiri.
+- **Keamanan, Target SLA, & UI Adaptif**:
+  - Autentikasi Bearer Token **Laravel Sanctum** dengan *Role Guard* (`admin`, `petugas`), pencabutan sesi akun ditangguhkan (HTTP `403`), serta *Rate Limiter* (`5/menit` pengajuan laporan, `10/menit` chatbot & login).
+  - Target waktu penyelesaian SLA per urgensi (**Darurat**: `24 Jam`, **Tinggi**: `3 Hari`, **Sedang**: `7 Hari`, **Rendah**: `14 Hari`) dan penanda `is_overdue`.
+  - Tata letak *sticky sidebar* (`justify-between`), header mobile/desktop responsif, dan *Splash Page Loader*.
 
 ---
 
-## 🛠️ Arsitektur & Teknologi
+## 🧱 Diagram Arsitektur Sistem & Alur Data
 
-| Komponen | Teknologi | Keterangan |
-|---|---|---|
-| **Frontend** | Next.js 16 (App Router), TypeScript, Tailwind CSS, Lucide Icons | Diekspor sebagai **Static HTML/CSS/JS Export** (`output: 'export'`) |
-| **Peta Interaktif** | Leaflet, React-Leaflet | Komponen client-only tanpa dependensi SSR |
-| **Kompresi Klien** | `browser-image-compression` | Kompresi foto sebelum upload multipart |
-| **Backend API** | Laravel 11 / 12, Laravel Sanctum, PHP 8.2+ | REST API berbasis Bearer Token Sanctum |
-| **Database** | SQLite 3 (Mode WAL — *Write-Ahead Logging*) | Performa tinggi, tanpa konfigurasi DBMS berat |
-| **Kecerdasan Buatan** | Google Gemini API (`gemini-2.5-flash`) | Analisis laporan, deteksi duplikasi, ringkasan eksekutif, dan Chatbot AI |
-| **Mode Mock** | In-Memory Stateful Mock (`NEXT_PUBLIC_USE_MOCK=true`) | Simulasi alur lengkap tanpa memerlukan server backend berjalan |
+### 1. Arsitektur Sistem
+```mermaid
+flowchart TB
+    subgraph Client["Peramban Pengguna (Web Client)"]
+        W["Warga (Publik)"]
+        A["Admin Verifikator"]
+        P["Petugas Lapangan"]
+        FE["Frontend Next.js 16 (Static Export)<br/>Leaflet Map + browser-image-compression"]
+        W --> FE
+        A --> FE
+        P --> FE
+    end
+
+    subgraph ExternalFE["Layanan Peta Klien"]
+        OSM["OpenStreetMap Tile Server"]
+        NOM["Nominatim Reverse Geocoding API"]
+    end
+
+    subgraph Backend["Backend REST API (/api/v1 — Laravel 13 + Sanctum)"]
+        API["Controllers & Role/Throttle Middleware"]
+        WF["ReportWorkflow & TicketService & GeoService (Haversine)"]
+        AISVC["Services AI<br/>ReportAnalyzer, InsightService, ChatbotService"]
+        API --> WF
+        API --> AISVC
+    end
+
+    subgraph Storage["Penyimpanan Lokal Backend"]
+        DB[("SQLite 3 (WAL Mode)<br/>reports, report_events, report_duplicates,<br/>report_categories, ai_insights, users")]
+        DISK["Uploads Disk (public/uploads)<br/>Foto Sebelum & Sesudah"]
+    end
+
+    GEMINI["Google Gemini API v1beta<br/>(Model: gemini-3.5-flash-lite)"]
+
+    FE <-->|"HTTP/JSON & Multipart + Bearer Token"| API
+    FE <-->|"Tile Peta & Alamat Koordinat"| OSM
+    FE <-->|"Koordinat -> Nama Jalan"| NOM
+    WF <--> DB
+    WF <--> DISK
+    AISVC <--> DB
+    AISVC -->|"JSON Schema / Multimodal Prompt (HTTPS)"| GEMINI
+```
+
+### 2. Alur Data & Siklus Hidup Laporan
+```mermaid
+flowchart LR
+    U1["1. Warga Kirim Laporan<br/>(Foto + Lokasi + Deskripsi)"] --> U2["2. Backend Simpan Tiket (#ADU-xxx)<br/>& Foto ke Uploads Disk"]
+    U2 --> U3["3. ReportAnalyzer + Gemini AI<br/>(Judul, Kategori, Urgensi, Ringkasan,<br/>Deteksi Duplikat Radius 150 m)"]
+    U3 --> S1(["Status: menunggu_verifikasi"])
+    S1 --> A1{"4. Keputusan Admin<br/>(/admin/verifikasi)"}
+    A1 -->|"Tolak (+ alasan)"| S5(["Status: ditolak"])
+    A1 -->|"Setujui (+ kategori & urgensi)"| S2(["Status: menunggu_penanganan"])
+    S2 --> P1["5. Petugas Ambil Tugas Atomik<br/>(Urut Urgensi & Jarak Haversine)"]
+    P1 --> S3(["Status: diproses<br/>+ Catatan Progres"])
+    S3 --> P2["6. Petugas Unggah Foto Bukti<br/>& Catatan Penyelesaian"]
+    P2 --> S4(["Status: selesai<br/>(Foto Sebelum vs Sesudah)"])
+    S1 & S2 & S3 & S4 & S5 -.->|"Pantau Real-time"| TR["Warga via /lacak & Chatbot /tanya-ai"]
+```
+
+---
+
+## 🛠️ Teknologi yang Digunakan
+
+| Lapisan | Teknologi / Layanan | Versi / Spesifikasi | Peran dalam Sistem |
+| :--- | :--- | :--- | :--- |
+| **Framework Frontend** | Next.js (App Router) & React | `16.4.5` / `19.3.0` | Antarmuka web dengan *Static HTML/CSS/JS Export* (`output: 'export'`) |
+| **Bahasa & Styling** | TypeScript & Tailwind CSS | `^5` / `^4` | Type safety & utilitas tata letak responsif |
+| **Ikon & Utilitas UI** | `lucide-react`, `clsx` | `^1.70.0` / `^2.1.1` | Ikon antarmuka konsisten & manajemen class CSS dinamis |
+| **Peta Interaktif** | Leaflet & React-Leaflet | `^1.9.4` / `^5.0.0` | Pemilihan koordinat pin warga & peta sebaran laporan admin |
+| **Kompresi Klien** | `browser-image-compression` | `^2.0.2` | Kompresi foto laporan di peramban sebelum unggah multipart |
+| **Framework Backend** | PHP & Laravel Framework | `^8.3` / `^13.17` | REST API `/api/v1`, validasi request, resource JSON, & rate limiting |
+| **Autentikasi API** | Laravel Sanctum | `^4.3` | Token Bearer personal dengan pembatasan peran (`admin` & `petugas`) |
+| **Database** | SQLite 3 (Mode WAL) | Built-in `pdo_sqlite` | Penyimpanan relasional ringan & cepat tanpa server DBMS terpisah |
+| **Kecerdasan Buatan** | Google Gemini API (`v1beta`) | `gemini-3.5-flash-lite` | Analisis laporan multimodal, deteksi duplikat, insight eksekutif, & chatbot |
+| **Layanan Peta & Geo** | OpenStreetMap & Nominatim API | Public HTTPS API | Render tile peta & reverse geocoding alamat dari koordinat GPS |
+| **Mode Simulasi** | Stateful In-Memory Mock | `NEXT_PUBLIC_USE_MOCK=true` | Pengujian alur frontend mandiri tanpa menyalakan backend |
+
+---
+
+## 🤖 Dokumentasi Penggunaan AI
+
+KawalWarga menggunakan **Google Gemini API** (`https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`) dengan model default **`gemini-3.5-flash-lite`** melalui `GeminiClient.php`.
+
+### Bagian Produk yang Memanfaatkan AI
+1. **Triase Laporan Otomatis & Deteksi Duplikasi (`ReportAnalyzer.php`)**
+   - **Pemicu**: Saat warga mengirim laporan baru (`POST /api/v1/reports`) atau saat admin menekan analisis ulang (`POST /api/v1/admin/reports/{ticket_id}/reanalyze`).
+   - **Cara Kerja**: Mengirim deskripsi teks, alamat, kandidat hingga 5 laporan terdekat dalam radius **150 meter** (disaring via bounding box SQL & jarak Haversine `GeoService`), serta foto warga secara multimodal (inline base64 jika ukuran `<= 4 MB`) dengan *JSON Schema* terstruktur.
+   - **Keluaran**: Judul ringkas (`<= 70` karakter), rekomendasi kategori aktif, tingkat urgensi awal, ringkasan singkat (`<= 220` karakter), serta daftar ID tiket yang berpotensi duplikat.
+2. **Ringkasan Eksekutif Dashboard Admin (`InsightService.php`)**
+   - **Pemicu**: Halaman Dashboard Admin (`GET /api/v1/admin/dashboard/ai-insight` dan `.../regenerate`).
+   - **Cara Kerja**: Mengirim data agregat jumlah laporan per status dan per kategori pada rentang tanggal terpilih untuk menghasilkan 3 poin ringkasan analitik beserta saran prioritas tindakan bagi admin/pimpinan.
+3. **Chatbot Asisten Warga 24 Jam — Tanya AI (`ChatbotService.php`)**
+   - **Pemicu**: Halaman `/tanya-ai` dan widget melayang (`POST /api/v1/chatbot`).
+   - **Cara Kerja**: Mengekstrak ID tiket (`#ADU-xxx`) atau nomor WhatsApp (fitur *Lupa ID Tiket*) dari pesan pengguna di backend, mengambil status laporan dari SQLite, lalu menggunakan Gemini API untuk merangkai jawaban bahasa Indonesia yang ramah disertai hingga 3 kartu tiket interaktif.
+
+### Perlindungan Privasi, Keamanan, & Ketahanan Fallback
+- **Zero PII Leakage ke AI**: Nomor telepon pelapor (`reporter_phone`) **tidak pernah dikirim** ke prompt `ReportAnalyzer` maupun `ChatbotService`, dan pola nomor telepon pada riwayat percakapan otomatis disensor menjadi `[NOMOR_TELEPON_DISENSOR]` sebelum diteruskan ke Gemini.
+- **Anti Prompt-Injection**: Input warga dibungkus dalam tag pemisah data (`<data_laporan>`, `<kandidat_duplikat>`) dengan instruksi sistem agar diperlakukan sebagai data non-instruksional.
+- **Graceful Fallback**: Jika `GEMINI_API_KEY` belum diisi, timeout (`AI_TIMEOUT`), atau kuota API habis, pengajuan laporan dan dashboard tetap berjalan normal menggunakan fallback lokal (potongan deskripsi sebagai judul, status `ai_status = failed`, dan ringkasan agregat berbasis aturan).
+
+### Penggunaan AI dalam Proses Pengembangan (Design & Coding Assistant)
+Selain integrasi AI di dalam fitur produk, tim juga memanfaatkan perangkat AI secara transparan selama proses perancangan dan pengembangan (*Hacking Week*):
+- **Perancangan PRD & Konsep UI/UX (Google Gemini)**: Menggunakan model **Google Gemini** (`Gemini 3.8 Flash`, `Gemini 4 Argon/Hydrogen`) untuk menyusun draf spesifikasi fitur (*PRD*), pemetaan alur pengguna, kontrak API, serta perumusan konsep dan *copywriting* antarmuka.
+- **Visualisasi Desain UI/UX (Figma AI)**: Menggunakan **Figma AI** untuk memvisualisasikan draf konsep UI/UX menjadi tata letak antarmuka, komponen responsif, serta acuan *design tokens* sebelum diimplementasikan ke kode.
+- **Penulisan & Refactoring Kode (AI Coding Assistant)**: Menggunakan model keluarga **Google Gemini** (`Gemini 3.8 Flash`, `Gemini 4 Argon/Hydrogen`) dan **Anthropic Claude** (`Sonnet` & `Opus`) untuk membantu penulisan *boilerplate* komponen Next.js, endpoint REST API Laravel, dan penyelarasan tipe data.
+- **Debugging & Automasi Dokumentasi**: Memanfaatkan asisten AI yang sama untuk membantu pelacakan bug (CORS, state UI, tata letak responsif), pembuatan skrip pengambilan tangkapan layar (`docs/screenshots/`), dan perapihan `README.md`.
+
+Seluruh keputusan desain akhir, kode, keamanan kredensial, dan pengujian fungsional tetap ditinjau, diuji, serta dipertanggungjawabkan sepenuhnya oleh anggota tim.
 
 ---
 
 ## 📁 Struktur Direktori
 
 ```text
-├── frontend/                       # Proyek Next.js (App Router, Static Export)
+├── frontend/                       # Proyek Next.js 16 (App Router, Static Export)
 │   ├── public/
 │   │   ├── .htaccess               # Konfigurasi Apache untuk static export di public_html
-│   │   ├── favicon.ico             # Favicon instansi KawalWarga
+│   │   ├── favicon.ico             # Favicon resmi KawalWarga
+│   │   ├── Logo.png                # Logo aplikasi KawalWarga
 │   │   └── mock/                   # Foto contoh aset demo
 │   ├── src/
 │   │   ├── app/                    # Routing halaman Next.js (SSG static export)
@@ -101,97 +231,119 @@ Dokumentasi visual alur pengaduan dan penanganan masalah infrastruktur (*Studi K
 │   │   │   ├── masuk/              # Login terpadu admin & petugas
 │   │   │   ├── layout.tsx          # Root layout, Google Font Inter, AuthProvider, Toast
 │   │   │   └── page.tsx            # Beranda: Form buat laporan warga
-│   │   ├── components/             # Komponen UI modular (Design System, Map, Chat)
-│   │   ├── lib/                    # API client, auth context, formatters, label enum
+│   │   ├── components/             # Komponen UI modular (Layout, Map, Chat, Report)
+│   │   ├── lib/                    # API client, config wilayah, auth context, geo/formatters
 │   │   └── mocks/                  # Mock data stateful untuk pengujian offline
 │   ├── .env.example                # Contoh konfigurasi environment frontend
 │   ├── next.config.ts              # Konfigurasi Next.js static export
 │   └── package.json
-├── backend/                        # REST API Laravel
-│   ├── app/                        # Controllers, Models, Resources, Services AI
-│   ├── database/seeders/           # 204 laporan demo & akun seeder
-│   ├── config/cors.php             # Pengaturan CORS origin domain frontend
-│   └── routes/api.php              # Definisi rute API v1
+├── backend/                        # REST API Laravel 13
+│   ├── app/                        # Controllers, Models, Enums, Resources, Services AI
+│   ├── config/                     # Pengaturan CORS, services Gemini, dll.
+│   ├── database/seeders/           # 204 laporan demo sintetis & akun seeder
+│   ├── routes/api.php              # Definisi rute API v1
+│   ├── .env.example                # Contoh konfigurasi environment backend
+│   └── composer.json
 ├── docs/                           # Aset dokumentasi & panduan dev lokal
 │   ├── screenshots/                # Tangkapan layar antarmuka aplikasi (12 alur lengkap)
 │   ├── Logo Kawal Warga.png        # Aset logo resmi KawalWarga
 │   └── LOCAL-DEV.md                # Panduan setup dev lokal & troubleshooting
-├── scripts/                        # Skrip pemeriksaan kontrak & paket build produksi
+├── scripts/                        # Skrip helper dev lokal, reset demo, & cek kontrak
 └── README.md                       # Dokumentasi utama monorepo
 ```
 
 ---
 
-## 💻 Panduan Menjalankan di Komputer Lokal
+## 💻 Panduan Instalasi, Konfigurasi, & Menjalankan Aplikasi
+
+### Prasyarat Sistem
+- **PHP `8.3+`** (dengan ekstensi aktif: `pdo_sqlite`, `sqlite3`, `mbstring`, `openssl`, `fileinfo`, `curl`, `gd`)
+- **Composer `2.x`**
+- **Node.js `20.x LTS` / `22.x LTS`** dan **npm `10.x+`**
+
+### Ringkasan Perintah Cepat
 
 | Layanan | Perintah | URL |
 |---|---|---|
-| **Backend** | `cd backend && composer install && cp .env.example .env && php artisan key:generate && php artisan migrate:fresh --seed && php artisan serve` | `http://localhost:8000` |
-| **Frontend** | `cd frontend && npm install && npm run dev` | `http://localhost:3000` |
+| **Backend** | `cd backend && composer install && cp .env.example .env && php artisan key:generate && touch database/database.sqlite && php artisan migrate:fresh --seed && php artisan serve` | `http://localhost:8000` |
+| **Frontend** | `cd frontend && npm install && cp .env.example .env.local && npm run dev` | `http://localhost:3000` |
 
-Konfigurasi lokal yang harus cocok:
+> **Opsional (Jalankan Sekaligus)**: Gunakan `.\scripts\dev.ps1` (Windows PowerShell) atau `bash scripts/dev.sh` (macOS/Linux/Git Bash). Detail troubleshooting lengkap tersedia di [`docs/LOCAL-DEV.md`](docs/LOCAL-DEV.md).
 
-| File | Isi |
-|---|---|
-| `backend/.env` | `APP_URL=http://localhost:8000`, `FRONTEND_URL=http://localhost:3000`, `DB_DATABASE` (path ke `database/database.sqlite`), `GEMINI_API_KEY`, `GEMINI_MODEL` |
-| `frontend/.env.local` | `NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1`, `NEXT_PUBLIC_USE_MOCK=false` |
-
-### 1. Menjalankan Frontend
-
-```bash
-cd frontend
-
-# Pasang dependensi
-npm install
-
-# Buat berkas environment
-cp .env.example .env.local
-
-# Jalankan server development
-npm run dev
-```
-
-Buka peramban di [http://localhost:3000](http://localhost:3000).
-
-> **Pilihan Mode API Frontend (`frontend/.env.local`)**:
-> - **Mode Mock Mandiri (Offline)**: `NEXT_PUBLIC_USE_MOCK=true` (dapat langsung mencoba seluruh alur tanpa menyalakan backend).
-> - **Mode API Nyata (Online)**: `NEXT_PUBLIC_USE_MOCK=false` dan `NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1`.
-
-### 2. Menjalankan Backend (Laravel)
-
+### 1. Setup & Jalankan Backend (`backend/`)
 ```bash
 cd backend
-
-# Pasang dependensi PHP
 composer install
-
-# Siapkan environment dan generate APP_KEY
 cp .env.example .env
 php artisan key:generate
-
-# Inisialisasi database SQLite dan isi 204 laporan demo
 touch database/database.sqlite
 php artisan migrate:fresh --seed
-
-# Jalankan server API backend
 php artisan serve
 ```
 
-Server backend berjalan di [http://localhost:8000](http://localhost:8000).
+### 2. Setup & Jalankan Frontend (`frontend/`)
+```bash
+cd frontend
+npm install
+cp .env.example .env.local
+```
+Pastikan isi `frontend/.env.local` untuk terhubung ke backend lokal:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+NEXT_PUBLIC_USE_MOCK=false
+```
+Lalu jalankan:
+```bash
+npm run dev
+```
+Buka peramban di [http://localhost:3000](http://localhost:3000).
+
+### 3. Konfigurasi Tambahan Fitur Tertentu
+- **Fitur AI (Triase, Insight, Chatbot)**: Isi `GEMINI_API_KEY` dari Google AI Studio dan atur `GEMINI_MODEL=gemini-3.5-flash-lite` di `backend/.env`. Jika dikosongkan, sistem menggunakan fallback lokal agar alur pelaporan tetap berjalan.
+- **Health Check AI**: Isi `HEALTH_KEY` di `backend/.env`, lalu kirim header `X-Health-Key: <nilai>` saat mengakses `GET /api/v1/health/ai`.
+- **Mode Simulasi Offline Frontend**: Ubah `NEXT_PUBLIC_USE_MOCK=true` di `frontend/.env.local` jika ingin menguji antarmuka frontend menggunakan data mock in-memory tanpa menjalankan Laravel.
+- **Izin Penyimpanan & SQLite WAL**: Pastikan folder `backend/database/`, `backend/storage/`, dan `backend/public/uploads/` memiliki izin tulis agar file gambar unggahan serta file `.sqlite-wal` / `.sqlite-shm` dapat dibuat.
+
+### 4. Daftar Variabel Lingkungan (`.env.example`)
+
+#### A. Backend (`backend/.env.example`)
+| Variabel | Contoh Nilai Lokal | Keterangan |
+|---|---|---|
+| `APP_NAME` | `KawalWarga` | Nama aplikasi Laravel |
+| `APP_ENV` | `local` | Environment (`local` / `production`) |
+| `APP_KEY` | *(diisi `key:generate`)* | Kunci enkripsi aplikasi Laravel |
+| `APP_DEBUG` | `true` | Detail error debug (`false` di production) |
+| `APP_URL` | `http://localhost:8000` | Base URL backend untuk membentuk URL absolut foto |
+| `APP_TIMEZONE` | `Asia/Jakarta` | Zona waktu server (`+07:00`) |
+| `APP_LOCALE` / `APP_FALLBACK_LOCALE` / `APP_FAKER_LOCALE` | `id` / `id` / `id_ID` | Lokal bahasa pesan validasi & seeder |
+| `DB_CONNECTION` | `sqlite` | Driver database SQLite |
+| `DB_DATABASE` | *(opsional, path absolut `.sqlite`)* | Path file database (default Laravel: `database/database.sqlite`) |
+| `FRONTEND_URL` | `http://localhost:3000` | Origin frontend yang diizinkan CORS (tanpa `/` di akhir) |
+| `GEMINI_API_KEY` | *(API Key Google AI Studio)* | Kunci autentikasi Google Gemini API |
+| `GEMINI_MODEL` | `gemini-3.5-flash-lite` | ID model Gemini yang dipakai backend |
+| `AI_TIMEOUT` | `12` | Timeout panggilan HTTP ke Gemini (detik) |
+| `GEMINI_DEBUG` | `false` | `true` untuk menampilkan detail error Gemini di chatbot lokal |
+| `HEALTH_KEY` | *(kunci rahasia opsional)* | Kunci pelindung endpoint `GET /api/v1/health/ai` |
+| `SANCTUM_TOKEN_EXPIRATION` | `720` | Masa aktif token login Sanctum dalam menit (12 jam) |
+| `DEMO_ADMIN_PASSWORD` / `DEMO_OFFICER_PASSWORD` | `password123` | Kata sandi opsional untuk akun seeder |
+
+#### B. Frontend (`frontend/.env.example`)
+| Variabel | Contoh Nilai Lokal | Keterangan |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000/api/v1` | Base URL REST API backend (tanpa `/` di akhir) |
+| `NEXT_PUBLIC_USE_MOCK` | `false` | `false` untuk API nyata; `true` untuk mode mock offline |
 
 ---
 
-## 🔑 Akun Demo & Tiket Pengujian
+## 🔑 Akun Demonstrasi & Tiket Pengujian
 
-### Akun Petugas & Admin
-
+### Akun Petugas & Admin (Seeder)
 | Peran | Email | Kata Sandi | Halaman Masuk |
 |---|---|---|---|
-| **Admin Verifikator** | `admin@kawalwarga.test` | `password123` | `/masuk/` |
-| **Petugas Lapangan** | `budi@kawalwarga.test` | `password123` | `/masuk/` |
+| **Admin Verifikator** (`Nadia Putri`) | `admin@kawalwarga.test` | `password123` | `/masuk/` |
+| **Petugas Lapangan** (`Budi Santoso`) | `budi@kawalwarga.test` | `password123` | `/masuk/` |
 
 ### Tiket Sampel untuk Pengujian Pelacakan & Chatbot
-
 | ID Tiket | Status | Kategori | Catatan Pengujian |
 |---|---|---|---|
 | `#ADU-204` | `menunggu_verifikasi` | Jalan Rusak | Menunggu verifikasi admin; terdeteksi mirip `#ADU-198` |
@@ -206,76 +358,28 @@ Server backend berjalan di [http://localhost:8000](http://localhost:8000).
 
 ## 🌐 Panduan Deployment Lengkap ke cPanel
 
-Platform KawalWarga dirancang untuk dapat di-deploy dengan mudah ke shared hosting cPanel standar:
-- **Frontend**: Di-deploy sebagai static files ke root `public_html/` (atau subdomain frontend `https://DOMAINKITA.com`).
+Platform KawalWarga dirancang agar mudah di-deploy ke shared hosting cPanel standar:
+- **Frontend**: Di-deploy sebagai static files ke root `public_html/` (atau subdomain `https://DOMAINKITA.com`).
 - **Backend API**: Di-deploy ke folder di luar `public_html` (misal `/home/USER/kawalwarga-api`) dengan document root subdomain mengarah ke folder `public/` (`https://api.DOMAINKITA.com`).
 
----
-
 ### A. Deployment Frontend ke `public_html`
-
-#### Langkah 1: Build Production Static Export
-Pastikan variabel environment diarahkan ke backend produksi:
-Di `frontend/.env.local` atau `frontend/.env.production`:
-```env
-NEXT_PUBLIC_API_URL=https://api.DOMAINKITA.com/api/v1
-NEXT_PUBLIC_USE_MOCK=false
-```
-
-Jalankan perintah build:
-```bash
-cd frontend
-npm run build
-```
-Seluruh file statis siap saji otomatis terbentuk di direktori `frontend/out/`.
-
-#### Langkah 2: Kompresi Berkas `out/`
-Kompresi seluruh isi folder `frontend/out/` menjadi berkas ZIP (misal: `kawalwarga-frontend.zip`).
-> **Penting**: Pastikan file `.htaccess` di dalam folder `frontend/out/` ikut terkompresi.
-
-#### Langkah 3: Unggah & Ekstrak via cPanel File Manager
-1. Masuk ke cPanel hosting Anda, buka menu **File Manager**.
-2. Masuk ke direktori `public_html/` (atau document root domain utama).
-3. Klik tombol **Upload** dan unggah berkas `kawalwarga-frontend.zip`.
-4. Klik kanan berkas ZIP tersebut di File Manager, pilih **Extract**.
-5. Pastikan berkas `index.html`, `404.html`, `.htaccess`, dan folder `_next`, `admin`, `petugas`, `lacak`, `tanya-ai`, `terkirim`, `masuk` berada tepat di bawah `public_html/`.
-
-#### Langkah 4: Konfigurasi File `.htaccess`
-Pastikan file `public_html/.htaccess` memuat konfigurasi pengamanan direktori, penanganan 404, dan pemaksaan HTTPS berikut:
-
-```apache
-# KawalWarga - Static Export Apache Configuration (.htaccess)
-# Tempatkan file ini di root public_html bersama seluruh isi out/
-
-Options -Indexes
-
-# Error Document 404 untuk halaman tidak ditemukan
-ErrorDocument 404 /404.html
-
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-
-    # Paksa HTTPS di production
-    RewriteCond %{HTTPS} !=on
-    RewriteCond %{HTTP_HOST} !^localhost [NC]
-    RewriteCond %{HTTP_HOST} !^127\.0\.0\.1
-    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-    # Pastikan routing folder dengan trailing slash bekerja optimal
-    DirectorySlash On
-    DirectoryIndex index.html
-</IfModule>
-```
-
-#### Langkah 5: Cek Sertifikat SSL / HTTPS
-Buka menu **SSL/TLS Status** di cPanel, pastikan domain `DOMAINKITA.com` berstatus valid (gembok hijau) via AutoSSL / Let's Encrypt. Akses situs melalui `https://DOMAINKITA.com`.
-
----
+1. **Set Environment Produksi** di `frontend/.env.production`:
+   ```env
+   NEXT_PUBLIC_API_URL=https://api.DOMAINKITA.com/api/v1
+   NEXT_PUBLIC_USE_MOCK=false
+   ```
+2. **Build Static Export**:
+   ```bash
+   cd frontend
+   npm run build
+   ```
+   Seluruh file statis siap saji otomatis terbentuk di direktori `frontend/out/`.
+3. **Kompresi & Ekstrak ke `public_html/`**: Kompres seluruh isi `frontend/out/` menjadi ZIP (pastikan `.htaccess` ikut terkompresi), unggah via **File Manager**, lalu **Extract** sehingga `index.html`, `404.html`, `.htaccess`, serta folder `_next`, `admin`, `petugas`, `lacak`, `tanya-ai`, `terkirim`, `masuk` berada langsung di bawah `public_html/`.
+4. **Pastikan Konfigurasi `.htaccess` & SSL**: Pastikan file `.htaccess` aktif untuk memaksa HTTPS, menangani `ErrorDocument 404 /404.html`, dan mengaktifkan `DirectorySlash On` serta `DirectoryIndex index.html`. Verifikasi status gembok HTTPS di menu **SSL/TLS Status**.
 
 ### B. Deployment Backend API ke `api.DOMAINKITA.com`
-
 1. **Subdomain**: Buat subdomain `api.DOMAINKITA.com` dengan Document Root mengarah ke `/home/USER/kawalwarga-api/public`.
-2. **Unggah Kode**: Unggah folder `backend/` ke `/home/USER/kawalwarga-api`.
+2. **Unggah Kode**: Unggah isi folder `backend/` ke `/home/USER/kawalwarga-api` dan pasang dependensi PHP (`composer install --no-dev --optimize-autoloader`).
 3. **Konfigurasi `.env`**:
    ```env
    APP_NAME=KawalWarga
@@ -286,83 +390,77 @@ Buka menu **SSL/TLS Status** di cPanel, pastikan domain `DOMAINKITA.com` berstat
    DB_CONNECTION=sqlite
    DB_DATABASE=/home/USER/kawalwarga-api/database/database.sqlite
    GEMINI_API_KEY=AIzaSy...
-   GEMINI_MODEL=gemini-2.5-flash
+   GEMINI_MODEL=gemini-3.5-flash-lite
    ```
-4. **Database & Izin**:
+4. **Database & Izin Folder**:
    ```bash
    cd ~/kawalwarga-api
+   php artisan key:generate
    touch database/database.sqlite
    php artisan migrate:fresh --seed --force
    chmod -R 775 storage bootstrap/cache database public/uploads
    chmod 664 database/database.sqlite
+   php artisan config:cache
    ```
-5. Untuk detail panduan backend lengkap, silakan merujuk ke [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 ---
 
 ## ✅ Checklist Uji Akhir Sistem (End-to-End Verification)
 
-Gunakan daftar periksa berikut untuk memverifikasi kesiapan sistem secara menyeluruh:
-
 ### 1. Alur Warga (Kirim Laporan -> Lacak Progres)
-- [x] Buka halaman beranda (`/`).
-- [x] Isi deskripsi masalah minimal 20 karakter.
-- [x] Unggah 1 foto bukti (terkompresi otomatis di bawah 1.5 MB).
-- [x] Pilih titik lokasi di peta Leaflet (geser pin atau klik *"Gunakan Lokasi Saya Saat Ini"*).
-- [x] Masukkan nomor WhatsApp opsional (format Indonesia `08...` atau `+62...`).
-- [x] Klik *"Kirim Laporan Sekarang"*, sistem memproses multipart dan mengarahkan ke `/terkirim?id=ADU-xxx`.
-- [x] Uji tombol *"Salin ID Tiket"* (menampilkan toast sukses).
-- [x] Uji tombol *"Simpan ke WhatsApp"* (membuka tautan `wa.me` dengan format pesan ID dan tautan pelacakan).
-- [x] Klik *"Lacak Laporan Saya"*, halaman `/lacak?id=ADU-xxx` terbuka menampilkan status *"Menunggu Verifikasi"*, stepper 4 langkah, dan foto warga.
+- [x] Buka halaman beranda (`/`), isi deskripsi minimal 20 karakter, unggah 1 foto bukti (terkompresi otomatis `< 1.5 MB`), pilih titik lokasi di peta Leaflet, dan kirim laporan.
+- [x] Uji halaman `/terkirim?id=ADU-xxx`: tombol *"Salin ID Tiket"* dan tautan *"Simpan ke WhatsApp"*.
+- [x] Buka `/lacak?id=ADU-xxx` untuk memverifikasi status *"Menunggu Verifikasi"*, stepper 4 langkah, dan foto warga.
 
-### 2. Alur Admin (Verifikasi Laporan -> Dashboard Monitoring)
-- [x] Buka `/masuk`, masukkan akun `admin@kawalwarga.test` / `password123`.
-- [x] Masuk ke antrean verifikasi di `/admin/verifikasi`.
-- [x] Buka tiket baru: periksa ringkasan analisis AI, konfirmasi kategori dan tingkat urgensi awal.
-- [x] Klik tombol *"Perbesar foto"* untuk memeriksa bukti foto warga resolusi tinggi dalam modal.
-- [x] Tinjau peringatan deteksi duplikat AI jika lokasi berdekatan dengan tiket lain.
-- [x] Masukkan catatan verifikasi untuk petugas, lalu klik *"Setujui & Teruskan"*. Tiket berpindah ke status *"Menunggu Penanganan"*.
-- [x] Uji tolak laporan pada tiket yang tidak sesuai: isi alasan minimal 10 karakter, status berubah menjadi *"Ditolak"*.
-- [x] Buka menu Dashboard (`/admin`): pastikan angka kartu statistik terbarui, pin lokasi muncul pada peta persebaran, ringkasan eksekutif AI terisi, dan grafik tren kategori bergeser.
-- [x] Buka `/admin/riwayat`: cari ID tiket pada kotak pencarian (debounce 400 ms) dan uji filter status/kategori.
-- [x] Buka `/admin/kategori`: tambah kategori baru dinamis, ubah status aktif/nonaktif, dan pastikan kategori baru langsung tersinkronisasi ke formulir warga dan filter petugas.
-- [x] Buka `/admin/petugas`: tambah akun petugas baru dengan email dan kata sandi, pantau beban penanganan tugas petugas, serta uji tombol tangguhkan akun (akun ditangguhkan tidak dapat login ke sistem).
+### 2. Alur Admin (Verifikasi Laporan -> Dashboard & SLA)
+- [x] Masuk di `/masuk` sebagai `admin@kawalwarga.test` / `password123`.
+- [x] Periksa badge notifikasi jumlah laporan belum diverifikasi pada sidebar & ikon lonceng topbar.
+- [x] Buka `/admin/verifikasi`: periksa ringkasan AI, perbesar foto warga, tinjau deteksi duplikat radius 150 m, lalu uji *"Setujui & Teruskan"* atau *"Tolak"*.
+- [x] Buka `/admin`: pastikan statistik (termasuk kartu *Melewati Target* SLA), peta sebaran pin, ringkasan eksekutif AI, dan grafik tren terbarui.
+- [x] Uji `/admin/riwayat`, `/admin/kategori`, dan `/admin/petugas` (termasuk fitur penangguhan akun).
 
-### 3. Alur Petugas (Ambil Laporan -> Selesaikan -> Terlihat oleh Warga)
-- [x] Buka `/masuk`, masuk sebagai petugas `budi@kawalwarga.test` / `password123`.
-- [x] Pada halaman `/petugas`, lihat daftar laporan di tab **Siap Ditangani** (diurutkan berdasarkan urgensi tertinggi dan jarak km dari posisi GPS petugas).
-- [x] Uji filter antrean siap ditangani dan tugas saya: filter berdasarkan ID Tiket, Kategori dinamis, dan Tingkat Urgensi.
-- [x] Buka detail laporan: cek catatan verifikasi admin dan tombol rute navigasi Google Maps.
-- [x] Klik tombol *"Ambil & Kerjakan Laporan"* (konfirmasi modal atomik). Status berubah menjadi *"Diproses"* dan muncul di tab **Tugas Saya** (`/petugas/tugas-saya`).
-- [x] Klik laporan yang sedang dikerjakan untuk membuka form penyelesaian (`/petugas/laporan?id=...`).
-- [x] Masukkan catatan tindakan penanganan minimal 10 karakter dan unggah 1 foto bukti hasil pengerjaan.
-- [x] Checklist validasi 2 syarat terpenuhi -> tombol *"Tandai Selesai"* menjadi aktif.
-- [x] Klik *"Tandai Selesai"*, status tiket berubah menjadi *"Selesai"*.
-- [x] Buka menu **Profil & Keamanan** (`/petugas/profil`): periksa rekam jejak tugas lapangan dan uji form ganti kata sandi mandiri (verifikasi kata sandi lama, kata sandi baru minimal 6 karakter, dan konfirmasi kata sandi).
-- [x] Buka kembali halaman publik `/lacak?id=ADU-xxx`: pastikan stepper menunjukkan tahap ke-4 (Selesai), serta komparasi foto **Sebelum** (foto warga) dan **Sesudah** (foto petugas) tampil berdampingan.
+### 3. Alur Petugas (Ambil Laporan -> Selesaikan -> Terlihat Warga)
+- [x] Masuk di `/masuk` sebagai `budi@kawalwarga.test` / `password123`.
+- [x] Pada `/petugas`, uji pengurutan prioritas & jarak GPS serta filter ID tiket, kategori, dan urgensi.
+- [x] Ambil laporan secara atomik -> status berubah ke *"Diproses"* di `/petugas/tugas-saya`.
+- [x] Unggah foto bukti & catatan minimal 10 karakter -> klik *"Tandai Selesai"*, lalu cek hasil komparasi foto **Sebelum** dan **Sesudah** di `/lacak?id=ADU-xxx`.
+- [x] Cek halaman `/petugas/profil` dan uji ganti kata sandi mandiri.
 
-### 4. Alur Chatbot AI (Tanya AI & Cek Tiket)
-- [x] Buka widget melayang *"Tanya AI"* di pojok kanan bawah atau kunjungi halaman `/tanya-ai`.
-- [x] Klik chip cepat *"Cek Status Tiket"* atau ketik `Cek laporan saya #ADU-200`. Asisten AI menjawab status terkini beserta kartu tiket interaktif yang dapat diklik ke `/lacak`.
-- [x] Klik chip cepat *"Lupa ID Tiket"* atau ketik nomor telepon `Saya lupa tiket, nomor saya 081299990198`. Asisten AI mengidentifikasi tiket terkait dan menampilkan daftar kartu tiket.
-- [x] Klik chip cepat *"Cara Melapor"*. Asisten AI memberikan panduan langkah pelaporan yang ringkas dan ramah.
-- [x] Uji batas request: penanganan error 429 atau pesan server ditangani secara ramah di dalam gelembung percakapan.
+### 4. Alur Chatbot AI (Tanya AI & Lupa Tiket)
+- [x] Uji widget melayang *"Tanya AI"* dan halaman `/tanya-ai` dengan chip cepat maupun input ID `#ADU-200`.
+- [x] Uji pencarian *"Lupa ID Tiket"* memakai nomor `081299990198`.
+- [x] Verifikasi penanganan ramah saat batas request (`429`) tercapai.
 
 ---
 
 ## 📚 Referensi Dokumentasi (`docs/`)
 
-- [`docs/LOCAL-DEV.md`](docs/LOCAL-DEV.md) — Panduan setup dev lokal, daftar variabel `.env`, verifikasi `curl`, & troubleshooting.
+- [`docs/LOCAL-DEV.md`](docs/LOCAL-DEV.md) — Panduan setup dev lokal, daftar variabel `.env`, verifikasi `curl`, dan solusi kendala umum (*troubleshooting*).
+
+---
+
+## 📜 Atribusi Template, Aset, Dataset, & Layanan Pihak Ketiga
+
+1. **Framework & Library Open-Source**:
+   - **Frontend**: [Next.js](https://nextjs.org/) (MIT), [React](https://react.dev/) (MIT), [Tailwind CSS](https://tailwindcss.com/) (MIT), [Lucide Icons](https://lucide.dev/) (ISC), [Leaflet](https://leafletjs.com/) (BSD-2-Clause), [React-Leaflet](https://react-leaflet.js.org/) (Hippocratic-2.1), [`browser-image-compression`](https://github.com/Donaldcwl/browser-image-compression) (MIT), [`clsx`](https://github.com/lukeed/clsx) (MIT).
+   - **Backend**: [Laravel Framework](https://laravel.com/) (MIT) dan [Laravel Sanctum](https://laravel.com/docs/sanctum) (MIT).
+2. **Peta, Tile, & Geocoding**:
+   - Data & tile peta oleh kontributor [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL).
+   - Reverse geocoding koordinat ke nama jalan menggunakan layanan publik **Nominatim OpenStreetMap**.
+3. **Layanan AI, Desain, & Tipografi**:
+   - Kecerdasan buatan aplikasi menggunakan **Google Gemini API** (`gemini-3.5-flash-lite`); bantuan pengembangan & desain menggunakan **Google Gemini**, **Anthropic Claude**, dan **Figma AI**.
+   - Tipografi antarmuka menggunakan font **Inter** dari [Google Fonts](https://fonts.google.com/specimen/Inter) (SIL Open Font License).
+4. **Aset Visual & Dataset Demo**:
+   - Logo, favicon, dan tangkapan layar aplikasi (`docs/Logo Kawal Warga.png`, `frontend/public/Logo.png`, `frontend/public/favicon.ico`, `frontend/public/mock/*`, `docs/screenshots/*`) dibuat dan disiapkan oleh tim pengembang untuk keperluan demonstrasi.
+   - Seluruh **204 laporan demo** (`DemoReportSeeder.php`) dan akun seeder (`UserSeeder.php`) merupakan data sintetis (*dummy dataset*), bukan data pribadi warga sebenarnya.
 
 ---
 
 ## 👥 Tim Penyusun & Pengembang
 
-Dikembangkan dengan penuh dedikasi untuk Kompetisi Hackathon **KawalWarga** 2026 oleh Mahasiswa Program Studi Teknik Informatika — **Universitas Pamulang**:
+Dikembangkan untuk **LOGICODIX 2026 Hackathon Competition** oleh mahasiswa Program Studi Teknik Informatika — **Universitas Pamulang**:
 
 | Peran | Anggota Tim | Tautan & Portofolio |
 | :--- | :--- | :--- |
 | **Backend & AI Lead** | **Ilyasa Ramadhany Ekaputra Ismail** | • GitHub: [github.com/yasaramdh07](https://github.com/yasaramdh07)<br>• Portofolio: [ilyasaramadhany.my.id](https://ilyasaramadhany.my.id/) |
 | **Frontend Lead** | **Dandy Ghaisan Vidyanto** | • GitHub: [github.com/SasukeWN](https://github.com/SasukeWN)<br>• Portofolio: [dandy-portofolio-blond.vercel.app](https://dandy-portofolio-blond.vercel.app/) |
-
-*Mahasiswa Program Studi Teknik Informatika — Universitas Pamulang*

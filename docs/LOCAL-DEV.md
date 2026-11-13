@@ -40,7 +40,7 @@ php artisan migrate:fresh --seed
 php artisan serve --host=127.0.0.1 --port=8000
 ```
 
-> **Penting:** Buka `backend/.env` dan isi `GEMINI_API_KEY` serta `GEMINI_MODEL=gemini-2.5-flash` agar fitur AI (analisis laporan otomatis, ringkasan eksekutif dashboard, dan chatbot) terhubung ke Google Gemini API. Bila dikosongkan, sistem otomatis menggunakan *fallback* tanpa membuat request gagal.
+> **Penting:** Buka `backend/.env` dan isi `GEMINI_API_KEY` serta `GEMINI_MODEL=gemini-3.5-flash-lite` agar fitur AI (analisis laporan otomatis, ringkasan eksekutif dashboard, dan chatbot) terhubung ke Google Gemini API. Bila dikosongkan, sistem otomatis menggunakan *fallback* tanpa membuat request gagal.
 
 ---
 
@@ -104,7 +104,7 @@ Tersedia skrip ringan tanpa dependensi tambahan di folder `scripts/`:
 | `DB_CONNECTION` | `sqlite` | Driver database SQLite (mode WAL otomatis aktif) |
 | `DB_DATABASE` | `/path/absolut/ke/backend/database/database.sqlite` | Path absolut ke file SQLite |
 | `GEMINI_API_KEY` | `AIzaSy...` | API Key dari Google AI Studio |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | Nama model Gemini |
+| `GEMINI_MODEL` | `gemini-3.5-flash-lite` | Nama model Gemini |
 | `AI_TIMEOUT` | `12` | Batas waktu HTTP ke Gemini dalam detik |
 | `HEALTH_KEY` | `kawalwarga-health-secret` | Kunci untuk header `X-Health-Key` pada `GET /api/v1/health/ai` |
 | `SANCTUM_TOKEN_EXPIRATION` | `720` | Masa aktif token login (12 jam) |
