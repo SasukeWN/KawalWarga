@@ -7,6 +7,8 @@ Platform pengaduan dan pemantauan masalah infrastruktur & lingkungan publik berb
 | **Kompetisi** | LOGICODIX 2026 Hackathon Competition |
 | **Kategori Lomba** | **Web** — Subtema 5: *Civic Tech & Community Service* |
 | **Nama Aplikasi** | **KawalWarga** |
+| **Live Demo (Web)** | [https://kawal-warga.vercel.app/](https://kawal-warga.vercel.app/) |
+| **Hosting Produksi** | Frontend di **Vercel** (Static Export) · Backend API di **cPanel** (Laravel + SQLite) |
 | **Nama Tim** | `Plantera` |
 | **Anggota Tim** | 1. **Ilyasa Ramadhany Ekaputra Ismail** (Backend & AI Lead)<br>2. **Dandy Ghaisan Vidyanto** (Frontend Lead) |
 | **Instansi** | Program Studi Teknik Informatika — **Universitas Pamulang** |
@@ -21,10 +23,10 @@ Platform pengaduan dan pemantauan masalah infrastruktur & lingkungan publik berb
 3. **Pengawasan Target Waktu (SLA) Belum Terukur**: Tanpa target waktu per tingkat urgensi, laporan berstatus darurat berisiko menumpuk atau melewati batas penanganan.
 
 ### Deskripsi Solusi
-**KawalWarga** menyediakan alur pengaduan end-to-end berbasis peta interaktif:
-- **Warga** dapat melapor cepat tanpa login (cukup foto terkompresi, deskripsi, dan pin lokasi peta), lalu melacak progres melalui ID tiket atau asisten **Tanya AI**.
+**KawalWarga** menyediakan alur pengaduan end-to-end berbasis peta interaktif dengan pendekatan **"Satu Instansi, Satu Alur Penanganan"** untuk **Dinas Prasarana & Lingkungan** yang membawahi banyak petugas lapangan:
+- **Warga** dapat melapor cepat tanpa login (cukup foto terkompresi, deskripsi, dan pin lokasi peta), menyimpan salinan ID tiket & tautan pelacakan langsung ke WhatsApp via deep-link `wa.me` (*tanpa biaya gateway API eksternal*), serta memantau progres melalui `/lacak` atau asisten **Tanya AI**.
 - **AI Multimodal (`gemini-3.5-flash-lite`)** menganalisis foto dan deskripsi laporan baru untuk menghasilkan judul ringkas, rekomendasi kategori, tingkat urgensi awal, serta mendeteksi kandidat laporan duplikat dalam radius **150 meter** menggunakan formula Haversine.
-- **Admin Verifikator & Petugas Lapangan** bekerja pada satu sistem berbasis SLA (*Darurat*: 24 jam, *Tinggi*: 3 hari, *Sedang*: 7 hari, *Rendah*: 14 hari) lengkap dengan notifikasi badge antrean verifikasi, peta sebaran, dan bukti foto penyelesaian *Sebelum vs Sesudah*.
+- **Admin Verifikator & Banyak Petugas Lapangan** bekerja pada satu sistem terukur berbasis SLA (*Darurat*: 24 jam, *Tinggi*: 3 hari, *Sedang*: 7 hari, *Rendah*: 14 hari) lengkap dengan notifikasi badge antrean verifikasi, peta sebaran, dan bukti foto penyelesaian *Sebelum vs Sesudah*.
 
 ### Target Pengguna
 | Peran Pengguna | Kebutuhan Utama yang Difasilitasi |
@@ -78,7 +80,7 @@ Dokumentasi visual alur pengaduan dan penanganan masalah infrastruktur (*Studi K
 
 - **Warga (Publik)**:
   - **Form Pelaporan Cepat Tanpa Login**: Kompresi foto otomatis di sisi klien (maks sisi `1600 px`, target `< 1.5 MB`), penentuan titik presisi peta Leaflet (pin dapat digeser & tombol *"Gunakan Lokasi Saya Saat Ini"*), pengisian alamat otomatis via reverse geocoding Nominatim OpenStreetMap, pilihan kategori dinamis, serta input nomor WhatsApp opsional.
-  - **Bukti Terkirim Interaktif (`/terkirim`)**: ID tiket otomatis (`#ADU-xxx`), tombol salin tiket, dan tautan *"Simpan ke WhatsApp"* (`wa.me`).
+  - **Bukti Terkirim Interaktif (`/terkirim`)**: ID tiket otomatis (`#ADU-xxx`), tombol salin tiket, dan tombol **"Simpan ke WhatsApp"** (`wa.me/?text=...`) untuk menyimpan pengingat nomor tiket & tautan pelacakan pribadi warga secara langsung (*client-side*).
   - **Pelacakan Transparan (`/lacak`)**: Mendukung 5 status (`menunggu_verifikasi`, `menunggu_penanganan`, `diproses`, `selesai`, `ditolak`) dengan stepper 4 langkah, indikator target waktu SLA, perbandingan foto **Sebelum vs Sesudah** pengerjaan, kartu kabar terbaru petugas, dan linimasa waktu lengkap.
   - **Asisten Chatbot Tanya AI (`/tanya-ai` & Widget Melayang)**: Chip pertanyaan cepat (*Cek Status Tiket*, *Lupa ID Tiket via WA*, *Cara Melapor*), pencarian tiket via ID atau nomor WhatsApp terdaftar, kartu tiket interaktif ke `/lacak`, dan penanganan rate limit ramah.
 - **Admin Verifikator (`/admin`)**:
@@ -109,7 +111,7 @@ flowchart TB
         W["Warga (Publik)"]
         A["Admin Verifikator"]
         P["Petugas Lapangan"]
-        FE["Frontend Next.js 16 (Static Export)<br/>Leaflet Map + browser-image-compression"]
+        FE["Frontend Next.js 16 — Vercel (Static Export)<br/>Leaflet Map + browser-image-compression"]
         W --> FE
         A --> FE
         P --> FE
@@ -120,7 +122,7 @@ flowchart TB
         NOM["Nominatim Reverse Geocoding API"]
     end
 
-    subgraph Backend["Backend REST API (/api/v1 — Laravel 13 + Sanctum)"]
+    subgraph Backend["Backend REST API — cPanel (/api/v1 — Laravel 13 + Sanctum)"]
         API["Controllers & Role/Throttle Middleware"]
         WF["ReportWorkflow & TicketService & GeoService (Haversine)"]
         AISVC["Services AI<br/>ReportAnalyzer, InsightService, ChatbotService"]
@@ -166,7 +168,7 @@ flowchart LR
 
 | Lapisan | Teknologi / Layanan | Versi / Spesifikasi | Peran dalam Sistem |
 | :--- | :--- | :--- | :--- |
-| **Framework Frontend** | Next.js (App Router) & React | `16.4.5` / `19.3.0` | Antarmuka web dengan *Static HTML/CSS/JS Export* (`output: 'export'`) |
+| **Framework Frontend** | Next.js (App Router) & React | `16.4.5` / `19.3.0` | Antarmuka web *Static Export* (`output: 'export'`) di **Vercel** |
 | **Bahasa & Styling** | TypeScript & Tailwind CSS | `^5` / `^4` | Type safety & utilitas tata letak responsif |
 | **Ikon & Utilitas UI** | `lucide-react`, `clsx` | `^1.70.0` / `^2.1.1` | Ikon antarmuka konsisten & manajemen class CSS dinamis |
 | **Peta Interaktif** | Leaflet & React-Leaflet | `^1.9.4` / `^5.0.0` | Pemilihan koordinat pin warga & peta sebaran laporan admin |
@@ -353,55 +355,6 @@ Buka peramban di [http://localhost:3000](http://localhost:3000).
 | `#ADU-176` | `selesai` | Jalan Rusak | Selesai; menampilkan foto Sebelum & Sesudah pengerjaan |
 | `#ADU-183` | `ditolak` | Sampah | Ditolak admin; menampilkan alasan penolakan resmi |
 | **Lupa ID** | *Pencarian Nomor* | — | Masukkan nomor WA `081299990198` di Chatbot AI |
-
----
-
-## 🌐 Panduan Deployment Lengkap ke cPanel
-
-Platform KawalWarga dirancang agar mudah di-deploy ke shared hosting cPanel standar:
-- **Frontend**: Di-deploy sebagai static files ke root `public_html/` (atau subdomain `https://DOMAINKITA.com`).
-- **Backend API**: Di-deploy ke folder di luar `public_html` (misal `/home/USER/kawalwarga-api`) dengan document root subdomain mengarah ke folder `public/` (`https://api.DOMAINKITA.com`).
-
-### A. Deployment Frontend ke `public_html`
-1. **Set Environment Produksi** di `frontend/.env.production`:
-   ```env
-   NEXT_PUBLIC_API_URL=https://api.DOMAINKITA.com/api/v1
-   NEXT_PUBLIC_USE_MOCK=false
-   ```
-2. **Build Static Export**:
-   ```bash
-   cd frontend
-   npm run build
-   ```
-   Seluruh file statis siap saji otomatis terbentuk di direktori `frontend/out/`.
-3. **Kompresi & Ekstrak ke `public_html/`**: Kompres seluruh isi `frontend/out/` menjadi ZIP (pastikan `.htaccess` ikut terkompresi), unggah via **File Manager**, lalu **Extract** sehingga `index.html`, `404.html`, `.htaccess`, serta folder `_next`, `admin`, `petugas`, `lacak`, `tanya-ai`, `terkirim`, `masuk` berada langsung di bawah `public_html/`.
-4. **Pastikan Konfigurasi `.htaccess` & SSL**: Pastikan file `.htaccess` aktif untuk memaksa HTTPS, menangani `ErrorDocument 404 /404.html`, dan mengaktifkan `DirectorySlash On` serta `DirectoryIndex index.html`. Verifikasi status gembok HTTPS di menu **SSL/TLS Status**.
-
-### B. Deployment Backend API ke `api.DOMAINKITA.com`
-1. **Subdomain**: Buat subdomain `api.DOMAINKITA.com` dengan Document Root mengarah ke `/home/USER/kawalwarga-api/public`.
-2. **Unggah Kode**: Unggah isi folder `backend/` ke `/home/USER/kawalwarga-api` dan pasang dependensi PHP (`composer install --no-dev --optimize-autoloader`).
-3. **Konfigurasi `.env`**:
-   ```env
-   APP_NAME=KawalWarga
-   APP_ENV=production
-   APP_DEBUG=false
-   APP_URL=https://api.DOMAINKITA.com
-   FRONTEND_URL=https://DOMAINKITA.com
-   DB_CONNECTION=sqlite
-   DB_DATABASE=/home/USER/kawalwarga-api/database/database.sqlite
-   GEMINI_API_KEY=AIzaSy...
-   GEMINI_MODEL=gemini-3.5-flash-lite
-   ```
-4. **Database & Izin Folder**:
-   ```bash
-   cd ~/kawalwarga-api
-   php artisan key:generate
-   touch database/database.sqlite
-   php artisan migrate:fresh --seed --force
-   chmod -R 775 storage bootstrap/cache database public/uploads
-   chmod 664 database/database.sqlite
-   php artisan config:cache
-   ```
 
 ---
 
